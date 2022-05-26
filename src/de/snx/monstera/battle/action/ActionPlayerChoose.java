@@ -85,8 +85,9 @@ public class ActionPlayerChoose extends BattleAction {
 		case ATTACK_MENU:
 			texts = new String[playerMoves.length];
 			for (int i = 0; i < playerMoves.length; i++)
-				texts[i] = (attackPointer == i ? "►" : " ") + playerMoves[i].getAp() + " / " + playerMoves[i].getApMax()
-						+ " | " + playerMoves[i].getName() + " (" + playerMoves[i].getType().name + ")";
+				texts[i] = (attackPointer == i ? "►" : " ") + playerMoves[i].getAp() + " / "
+						+ playerMoves[i].getApMax() + " | " + playerMoves[i].getName() + " ("
+						+ playerMoves[i].getType().name + ")";
 			break;
 		default:
 			texts = new String[0];

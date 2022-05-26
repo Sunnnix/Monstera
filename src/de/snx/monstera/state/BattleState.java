@@ -12,6 +12,7 @@ import de.snx.monstera.battle.Battler;
 import de.snx.monstera.battle.Battler.AbilityData;
 import de.snx.monstera.battle.action.ActionEncounter;
 import de.snx.monstera.battle.action.BattleAction;
+import de.snx.monstera.battle.monstertype.MonsterType;
 import lombok.Setter;
 
 public class BattleState extends GameState {
@@ -31,7 +32,7 @@ public class BattleState extends GameState {
 	public BattleState(int id) {
 		super(id);
 		setBackgroundColor(Color.WHITE);
-		player[0] = new Battler("Monster 1", 12);
+		player[0] = new Battler(12).setType(MonsterType.BULBASAUR);
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class BattleState extends GameState {
 		showEnemy = false;
 		showPlayerGUI = false;
 		showEnemyGUI = false;
-		enemy[0] = new Battler("Monster 2", 3);
+		enemy[0] = new Battler(10).setType(MonsterType.BULBASAUR);
 		text = new String[0];
 		action.clear();
 		action.add(new ActionEncounter(this, true));
