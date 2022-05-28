@@ -45,7 +45,7 @@ public class ActionGainXP extends BattleAction {
 			timer++;
 		} else {
 			state.getPlayer().setGraphicXPMod(0);
-			state.getPlayer().addXP(partXP);
+			state.getPlayer().addXP(partXP, state);
 			partXP = 0;
 			timer = 0;
 		}

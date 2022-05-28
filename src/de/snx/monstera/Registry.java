@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import de.snx.monstera.battle.Ability;
 import de.snx.monstera.map.event.Event;
 import de.snx.psf.PSFFileIO;
 
 public class Registry {
 
 	private static HashMap<String, Class<? extends Event>> event = new HashMap<>();
+	private static HashMap<String, Ability> abilities = new HashMap<>();
 
 	public static final void registerEvent(Class<? extends Event> clazz) {
 		try {
@@ -18,8 +20,7 @@ public class Registry {
 			clazz.getConstructor();
 			clazz.getConstructor(PSFFileIO.class);
 			if (name == null)
-				throw new NullPointerException(
-						"The static field REGISTRY_NAME must be implemented");
+				throw new NullPointerException("The static field REGISTRY_NAME must be implemented");
 			event.put(name, clazz);
 		} catch (NullPointerException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException
 				| NoSuchFieldException | SecurityException e) {
@@ -57,6 +58,26 @@ public class Registry {
 
 	public static List<String> getAllEvents() {
 		return new ArrayList<String>(event.keySet().stream().collect(Collectors.toList()));
+	}
+
+	public static Ability registerAbility(Ability ability) {
+		abilities.put(ability.name, ability);
+		return ability;
+	}
+
+	public static Ability loadAbility(String key, PSFFileIO file) {
+		Ability a = null;
+		try {
+			a = Ability.class.getConstructor(PSFFileIO.class).newInstance(file);
+			abilities.put(a.name, a);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return a;
+	}
+
+	public static Ability getAbility(String key) {
+		return abilities.get(key);
 	}
 
 }

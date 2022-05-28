@@ -2,7 +2,9 @@ package de.snx.monstera.battle;
 
 import java.awt.image.BufferedImage;
 
+import de.snx.monstera.battle.action.ActionShowText;
 import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.state.BattleState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +16,7 @@ public class Battler {
 
 	private double hp, atk, def, s_atk, s_def, speed;
 	@Getter
-	private byte level = 5;
+	private byte level;
 
 	private double currentHP;
 
@@ -22,23 +24,18 @@ public class Battler {
 
 	@Getter
 	@Setter
-	private int xp, xpToNextLv = 25, xpDrop = 8;
+	private int xp, xpToNextLv = 25, xpDrop = 28;
 
-	private AbilityData[] abilitys = new AbilityData[] { new AbilityData(null), new AbilityData(null),
+	private AbilityData[] abilities = new AbilityData[] { new AbilityData(null), new AbilityData(null),
 			new AbilityData(null), new AbilityData(null) };
 
 	@Setter
 	private double graphicHPMod, graphicXPMod;
 
-	public Battler(int level) {
+	public Battler(int level, MonsterType type) {
 		this.level = (byte) level;
-		generateStats();
-		setAbilitys();
-	}
-
-	public Battler setType(MonsterType type) {
 		this.type = type;
-		return this;
+		generateStats();
 	}
 
 	/**
@@ -48,10 +45,10 @@ public class Battler {
 		int lv = level;
 		level = 0;
 		for (int i = 0; i < lv; i++)
-			onLevelUp();
+			onLevelUp(null);
 	}
 
-	private int[] onLevelUp() {
+	private int[] onLevelUp(BattleState state) {
 		level++;
 		if (level == 1) {
 			hp = type.hp / 3;
@@ -71,27 +68,34 @@ public class Battler {
 			prefState[3] = (int) s_atk;
 			prefState[4] = (int) s_def;
 			prefState[5] = (int) speed;
-			hp += type.hp * .15 * (1 + level * .15);
-			currentHP += type.hp * .15 * (1 + level * .15);
-			atk = type.atk * .075 * (1 + level * .15);
-			def = type.def * .075 * (1 + level * .15);
-			s_atk = type.s_atk * .075 * (1 + level * .15);
-			s_def = type.s_def * .075 * (1 + level * .15);
-			speed = type.speed * .075 * (1 + level * .15);
+			double lvMult = .01;
+			double hpMult = .1;
+			double mult = .075;
+			hp += type.hp * hpMult * (1 + level * lvMult);
+			currentHP += type.hp * hpMult * (1 + level * lvMult);
+			atk = type.atk * mult * (1 + level * lvMult);
+			def = type.def * mult * (1 + level * lvMult);
+			s_atk = type.s_atk * mult * (1 + level * lvMult);
+			s_def = type.s_def * mult * (1 + level * lvMult);
+			speed = type.speed * mult * (1 + level * lvMult);
 			increase[0] = (int) (hp - prefState[0]);
 			increase[1] = (int) (atk - prefState[1]);
 			increase[2] = (int) (def - prefState[2]);
 			increase[3] = (int) (s_atk - prefState[3]);
 			increase[4] = (int) (s_def - prefState[4]);
 			increase[5] = (int) (speed - prefState[5]);
+			Ability[] ability = type.getAbilitiesOnLevelUp(level);
+			for (Ability a2l : ability)
+				for (int i = 0; i < abilities.length; i++)
+					if (abilities[i].ability.equals(Abilities.NULL)) {
+						abilities[i] = new AbilityData(a2l);
+						if (state != null)
+							state.setNextAction(
+									new ActionShowText(state, getName() + " has learned " + a2l.name + "!"));
+						break;
+					}
 			return increase;
 		}
-	}
-
-	private void setAbilitys() {
-		abilitys[0] = new AbilityData(Abilities.TACKLE);
-		abilitys[1] = new AbilityData(Abilities.QUICK_ATTACK);
-		abilitys[2] = new AbilityData(Abilities.AMBER);
 	}
 
 	public BufferedImage getImage(int pos) {
@@ -133,12 +137,12 @@ public class Battler {
 
 	public AbilityData[] getAbilitys() {
 		int count = 0;
-		for (AbilityData abilityData : abilitys)
+		for (AbilityData abilityData : abilities)
 			if (abilityData != null && abilityData.getType() != null)
 				count++;
 		AbilityData[] a = new AbilityData[count];
 		count = 0;
-		for (AbilityData abilityData : abilitys)
+		for (AbilityData abilityData : abilities)
 			if (abilityData != null && abilityData.getType() != null) {
 				a[count] = abilityData;
 				count++;
@@ -156,12 +160,12 @@ public class Battler {
 		return xp + graphicXPMod;
 	}
 
-	public void addXP(int xp) {
+	public void addXP(int xp, BattleState state) {
 		this.xp += xp;
 		if (this.xp >= xpToNextLv) {
 			this.xp = 0;
 			xpToNextLv *= 1.15;
-			onLevelUp();
+			onLevelUp(state);
 		}
 	}
 
@@ -197,14 +201,6 @@ public class Battler {
 			return ability.type;
 		}
 
-		public int attack(Battler a, Battler b) {
-			double dmg = ability.power / 100d * a.atk * 2.5;
-			boolean crit = Math.random() < .25;
-			b.currentHP -= (int) (dmg * (crit ? 2 : 1));
-			ap--;
-			return Ability.STATUS_SUCCESS + (crit ? Ability.STATUS_CRIT : 0);
-		}
-
 		public double getPower() {
 			return ability.power;
 		}
@@ -215,37 +211,37 @@ public class Battler {
 
 	}
 
-	public double getEffectifeLevel(Type type) {
-		double effectness = 1;
+	public double getEffectiveLevel(Type type) {
+		double effectiveness = 1;
 		// Type 1
 		Type[] immune = this.type.type1.immune.get();
 		for (Type t : immune)
 			if (t.equals(type))
-				effectness = 0;
+				effectiveness = 0;
 		Type[] strong = this.type.type1.strong.get();
 		for (Type t : strong)
 			if (t.equals(type))
-				effectness *= .5;
+				effectiveness *= .5;
 		Type[] weak = this.type.type1.weak.get();
 		for (Type t : weak)
 			if (t.equals(type))
-				effectness *= 2;
+				effectiveness *= 2;
 		// Type 2
 		if (this.type.type2 != null) {
 			immune = this.type.type2.immune.get();
 			for (Type t : immune)
 				if (t.equals(type))
-					effectness = 0;
+					effectiveness = 0;
 			strong = this.type.type2.strong.get();
 			for (Type t : strong)
 				if (t.equals(type))
-					effectness *= .5;
+					effectiveness *= .5;
 			weak = this.type.type2.weak.get();
 			for (Type t : weak)
 				if (t.equals(type))
-					effectness *= 2;
+					effectiveness *= 2;
 		}
-		return effectness;
+		return effectiveness;
 	}
 
 }

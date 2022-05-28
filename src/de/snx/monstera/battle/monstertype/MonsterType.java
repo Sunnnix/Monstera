@@ -1,8 +1,13 @@
 package de.snx.monstera.battle.monstertype;
 
+import java.util.ArrayList;
+
+import de.snx.monstera.battle.Abilities;
+import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.BattlerImage;
 import de.snx.monstera.battle.Battlers;
 import de.snx.monstera.battle.Type;
+import de.snx.monstera.creator.Pair;
 
 public class MonsterType {
 
@@ -20,10 +25,13 @@ public class MonsterType {
 	public final int xpDrop, xpNeed, xpInc; // for xp calculations
 	public final double xpInc2;
 
+	public final Pair<Byte, Ability>[] abilities;
+
 	public final BattlerImage img;
 
 	private MonsterType(int id, String name, Type type1, Type type2, int hp, int atk, int def, int s_atk, int s_def,
-			int speed, int xpDrop, int xpToNextLevel, int xpInc, double xpInc2, BattlerImage img) {
+			int speed, int xpDrop, int xpToNextLevel, int xpInc, double xpInc2, ArrayList<Pair<Byte, Ability>> abilOnLv,
+			BattlerImage img) {
 		this.ID = id;
 		this.name = name;
 		this.type1 = type1;
@@ -38,13 +46,14 @@ public class MonsterType {
 		this.xpNeed = xpToNextLevel;
 		this.xpInc = xpInc;
 		this.xpInc2 = xpInc2;
+		this.abilities = abilOnLv.toArray(new Pair[0]);
 		this.img = img;
 	}
 
 	static {
 		NULL = new Builder(0, "MissingNo").build();
 		BULBASAUR = new Builder(1, "Bulbasaur").setType(Type.GRASS, Type.POISON).setStats(45, 49, 49, 65, 65, 45)
-				.build();
+				.addAb(1, Abilities.TACKLE).addAb(1, Abilities.GROWL).build();
 		IVYSAUR = new Builder(2, "Ivysaur").setType(Type.GRASS, Type.POISON).setStats(60, 62, 63, 80, 80, 60).build();
 		VENUSAUR = new Builder(3, "Venusaur").setType(Type.GRASS, Type.POISON).setStats(80, 82, 83, 100, 100, 80)
 				.build();
@@ -59,6 +68,7 @@ public class MonsterType {
 		private int xpDrop = 8, xpNeed = 25, xpInc1 = 5;
 		private double xpInc2 = 1.1;
 		private BattlerImage img = Battlers.NULL;
+		private ArrayList<Pair<Byte, Ability>> abilities = new ArrayList<>();
 
 		public Builder(int id, String name) {
 			this.id = id;
@@ -98,11 +108,24 @@ public class MonsterType {
 			return this;
 		}
 
-		public MonsterType build() {
-			return new MonsterType(id, name, type1, type2, hp, atk, def, s_atk, s_def, speed, xpDrop, xpNeed, xpInc1,
-					xpInc2, img);
+		public Builder addAb(int level, Ability ability) {
+			this.abilities.add(new Pair<Byte, Ability>((byte) level, ability));
+			return this;
 		}
 
+		public MonsterType build() {
+			return new MonsterType(id, name, type1, type2, hp, atk, def, s_atk, s_def, speed, xpDrop, xpNeed, xpInc1,
+					xpInc2, abilities, img);
+		}
+
+	}
+
+	public Ability[] getAbilitiesOnLevelUp(byte level) {
+		ArrayList<Ability> a = new ArrayList<>();
+		for (Pair<Byte, Ability> abLv : abilities)
+			if (abLv.object1 == level)
+				a.add(abLv.object2);
+		return a.toArray(new Ability[0]);
 	}
 
 }

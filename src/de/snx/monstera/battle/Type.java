@@ -1,5 +1,7 @@
 package de.snx.monstera.battle;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class Type {
@@ -55,6 +57,30 @@ public class Type {
 				.addStrong(() -> new Type[] { POISON, ROCK, FIRE, ELECTRIC }).addImmune(() -> new Type[] { FLYING })
 				.build();
 		DRAGON = new Type.Builder("Dragon", true).addStrong(() -> new Type[] { DRAGON }).build();
+	}
+
+	public static String[] getTypes() {
+		return Arrays.asList(Type.class.getFields()).stream().filter(f -> f.getType().equals(Type.class)).map(f -> {
+			try {
+				return ((Type) f.get(null)).name;
+			} catch (IllegalAccessException | IllegalArgumentException e) {
+				throw new RuntimeException(e);
+			}
+		}).toArray(String[]::new);
+	}
+
+	public static Type getTypeFromString(String name) {
+		try {
+			Field[] f = Type.class.getFields();
+			for (Field field : f) {
+				Type t = (Type) field.get(null);
+				if (t.name.equals(name))
+					return t;
+			}
+			return Type.NONE;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public final String name;

@@ -22,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.filechooser.FileFilter;
 
+import de.snx.monstera.battle.Ability;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -149,6 +150,7 @@ public class MapViewPanel extends JPanel {
 			return;
 		maps.clear();
 		try (PSFFileIO file = new PSFFileIO(mapData, "r")) {
+			Ability.loadAll(file);
 			file.room("maps", _s -> {
 				int size = file.readInt("size");
 				for (int i = 0; i < size; i++) {
@@ -180,11 +182,12 @@ public class MapViewPanel extends JPanel {
 			JOptionPane.showMessageDialog(win, "The player is not set!");
 			return;
 		}
-		String name = JOptionPane.showInputDialog(win, "mapname");
+		String name = JOptionPane.showInputDialog(win, "Project name:");
 		if (name == null || name.isEmpty())
 			return;
 		HashSet<String> usedKeys = new HashSet<>();
 		try (PSFFileIO file = new PSFFileIO("Creator/output/" + name + ".map", "w")) {
+			Ability.saveAll(file);
 			file.room("player", _s -> {
 				file.write("map_id", pMapID);
 				file.write("x", player.getX());

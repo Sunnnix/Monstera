@@ -9,7 +9,7 @@ public class ActionUseAbility extends BattleAction {
 	private Battler attacker, target;
 	private AbilityData ability;
 	private boolean crit;
-	private double effective;
+	private double effectiveness;
 	private final int TOTAL_DAMAGE;
 	private double hp_animation, animTicks = .25;
 	private boolean first;
@@ -39,11 +39,11 @@ public class ActionUseAbility extends BattleAction {
 				state.clearAction();
 				state.setNextAction(new ActionDefeatMonster(state, target));
 			}
-			if (effective == 0)
+			if (effectiveness == 0)
 				state.setNextAction(new ActionShowText(state, ability.getName() + " has no effect."));
-			else if (effective > 1)
-				state.setNextAction(new ActionShowText(state, "It was super effective"));
-			else if (effective < 1)
+			else if (effectiveness > 1)
+				state.setNextAction(new ActionShowText(state, "It is super effective"));
+			else if (effectiveness < 1)
 				state.setNextAction(new ActionShowText(state, "It is not effective"));
 			if (crit)
 				state.setNextAction(new ActionShowText(state, "A critical Hit!"));
@@ -53,13 +53,14 @@ public class ActionUseAbility extends BattleAction {
 
 	public int calculateDamage() {
 		double dmg = ability.getPower() / 100d * attacker.getAtk() * 4.5;
+		dmg -= target.getDef() / 2;
 		crit = Math.random() < .25;
 		if (crit)
 			dmg *= 2;
-		effective = target.getEffectifeLevel(ability.getType());
-		dmg *= effective;
+		effectiveness = target.getEffectiveLevel(ability.getType());
+		dmg *= effectiveness;
 		ability.useAP();
-		return (int) dmg;
+		return (int) (dmg <= 0 ? 1 : dmg);
 	}
 
 }

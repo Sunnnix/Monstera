@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import javax.management.openmbean.TabularData;
+
 import de.snx.monstera.Game;
 import de.snx.monstera.Keys;
 import de.snx.monstera.battle.Battler;
@@ -32,7 +34,7 @@ public class BattleState extends GameState {
 	public BattleState(int id) {
 		super(id);
 		setBackgroundColor(Color.WHITE);
-		player[0] = new Battler(12).setType(MonsterType.BULBASAUR);
+		player[0] = new Battler(5, MonsterType.BULBASAUR);
 	}
 
 	@Override
@@ -41,7 +43,7 @@ public class BattleState extends GameState {
 		showEnemy = false;
 		showPlayerGUI = false;
 		showEnemyGUI = false;
-		enemy[0] = new Battler(10).setType(MonsterType.BULBASAUR);
+		enemy[0] = new Battler(3, MonsterType.BULBASAUR);
 		text = new String[0];
 		action.clear();
 		action.add(new ActionEncounter(this, true));
