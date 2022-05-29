@@ -12,7 +12,7 @@ public class Battler {
 
 	private String name;
 
-	private MonsterType type = MonsterType.NULL;
+	private MonsterType type = MonsterType.MISSINGNO;
 
 	private double hp, atk, def, s_atk, s_def, speed;
 	@Getter

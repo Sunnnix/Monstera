@@ -1,5 +1,6 @@
 package de.snx.monstera.battle;
 
+//TODO delete
 public class Abilities {
 
 	public static final Ability NULL;
@@ -18,7 +19,8 @@ public class Abilities {
 		GROWL = new Ability.Builder("Growl", Type.NORMAL).setAP(40).build(); // TODO add effect
 		LEECH_SEED = new Ability.Builder("Leech Seed", Type.GRASS).setAccuracy(90).setAP(10).build(); // TODO add effect
 		VINE_WHIP = new Ability.Builder("Vine Whip", Type.GRASS).setPower(35).setAP(10).build();
-		POISON_POWDER = new Ability.Builder("Poison Powder", Type.POISON).setAccuracy(75).setAP(35).build(); // TODO add effect
+		POISON_POWDER = new Ability.Builder("Poison Powder", Type.POISON).setAccuracy(75).setAP(35).build(); // TODO add
+																												// effect
 		RAZOR_LEAF = new Ability.Builder("Razor Leaf", Type.GRASS).build();
 		QUICK_ATTACK = new Ability.Builder("Quick Attack", Type.NORMAL).setPower(40).setAccuracy(100).setAP(30)
 				.setPriority(1).build();
