@@ -49,6 +49,7 @@ public class Battler {
 	}
 
 	private int[] onLevelUp(BattleState state) {
+		int[] increase = new int[6];
 		level++;
 		if (level == 1) {
 			hp = type.hp / 3;
@@ -58,10 +59,8 @@ public class Battler {
 			s_atk = type.s_atk / 3;
 			s_def = type.s_def / 3;
 			speed = type.speed / 3;
-			return new int[6];
 		} else {
 			int[] prefState = new int[6];
-			int[] increase = new int[6];
 			prefState[0] = (int) hp;
 			prefState[1] = (int) atk;
 			prefState[2] = (int) def;
@@ -84,18 +83,17 @@ public class Battler {
 			increase[3] = (int) (s_atk - prefState[3]);
 			increase[4] = (int) (s_def - prefState[4]);
 			increase[5] = (int) (speed - prefState[5]);
-			Ability[] ability = type.getAbilitiesOnLevelUp(level);
-			for (Ability a2l : ability)
-				for (int i = 0; i < abilities.length; i++)
-					if (abilities[i].ability.equals(Abilities.NULL)) {
-						abilities[i] = new AbilityData(a2l);
-						if (state != null)
-							state.setNextAction(
-									new ActionShowText(state, getName() + " has learned " + a2l.name + "!"));
-						break;
-					}
-			return increase;
 		}
+		Ability[] ability = type.getAbilitiesOnLevelUp(level);
+		for (Ability a2l : ability)
+			for (int i = 0; i < abilities.length; i++)
+				if (abilities[i].ability.equals(Abilities.NULL)) {
+					abilities[i] = new AbilityData(a2l);
+					if (state != null)
+						state.setNextAction(new ActionShowText(state, getName() + " has learned " + a2l.name + "!"));
+					break;
+				}
+		return increase;
 	}
 
 	public BufferedImage getImage(int pos) {

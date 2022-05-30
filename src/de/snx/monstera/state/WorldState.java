@@ -9,6 +9,8 @@ import java.util.List;
 
 import de.snx.monstera.Game;
 import de.snx.monstera.Keys;
+import de.snx.monstera.battle.Ability;
+import de.snx.monstera.battle.monstertype.MonsterType;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.Entitys;
 import de.snx.monstera.map.Map;
@@ -34,6 +36,8 @@ public class WorldState extends GameState {
 		setBackgroundColor(Color.BLACK);
 		String fileName = "test";
 		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".map")) {
+			Ability.loadAll(file);
+			MonsterType.loadAll(file);
 			file.room("maps", _s -> {
 				int size = file.readInt("size");
 				for (int i = 0; i < size; i++) {

@@ -34,7 +34,7 @@ public class BattleState extends GameState {
 	public BattleState(int id) {
 		super(id);
 		setBackgroundColor(Color.WHITE);
-		player[0] = new Battler(5, MonsterType.BULBASAUR);
+		player[0] = new Battler(5, MonsterType.getMonsterType(1));
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class BattleState extends GameState {
 		showEnemy = false;
 		showPlayerGUI = false;
 		showEnemyGUI = false;
-		enemy[0] = new Battler(3, MonsterType.BULBASAUR);
+		enemy[0] = new Battler(3, MonsterType.getMonsterType(1));
 		text = new String[0];
 		action.clear();
 		action.add(new ActionEncounter(this, true));

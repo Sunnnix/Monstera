@@ -76,8 +76,6 @@ public class MonsterType {
 		return id;
 	}
 
-	public static final MonsterType BULBASAUR, IVYSAUR, VENUSAUR;
-
 	public final int ID;
 	public final String name;
 
@@ -170,14 +168,6 @@ public class MonsterType {
 		this.xpInc2 = xpInc2;
 		this.abilities = abilOnLv.toArray(new Pair[0]);
 		this.img = img;
-	}
-
-	static {
-		BULBASAUR = new Builder(1, "Bulbasaur").setType(Type.GRASS, Type.POISON).setStats(45, 49, 49, 65, 65, 45)
-				.addAb(1, Abilities.TACKLE).addAb(1, Abilities.GROWL).build();
-		IVYSAUR = new Builder(2, "Ivysaur").setType(Type.GRASS, Type.POISON).setStats(60, 62, 63, 80, 80, 60).build();
-		VENUSAUR = new Builder(3, "Venusaur").setType(Type.GRASS, Type.POISON).setStats(80, 82, 83, 100, 100, 80)
-				.build();
 	}
 
 	public static class Builder {
