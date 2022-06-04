@@ -9,9 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.snx.monstera.Keys;
 import de.snx.monstera.creator.CreatorWindow;
 import de.snx.monstera.creator.Pair;
+import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.Map;
 import de.snx.monstera.state.GameStateManager;

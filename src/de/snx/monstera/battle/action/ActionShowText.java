@@ -1,6 +1,6 @@
 package de.snx.monstera.battle.action;
 
-import de.snx.monstera.Keys;
+import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.state.BattleState;
 
 public class ActionShowText extends BattleAction {

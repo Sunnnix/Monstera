@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import de.snx.monstera.Keys;
+import de.snx.monstera.global_data.Keys;
 
 public abstract class GameState {
 
@@ -26,7 +26,7 @@ public abstract class GameState {
 
 	}
 
-	protected void load() {
+	protected void load(String... args) {
 
 	}
 

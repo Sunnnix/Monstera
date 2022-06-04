@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.snx.monstera.Game;
-import de.snx.monstera.Keys;
 import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.global_data.CombatGroups;
+import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.Entitys;
 import de.snx.monstera.map.Map;
@@ -38,6 +39,7 @@ public class WorldState extends GameState {
 		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".map")) {
 			Ability.loadAll(file);
 			MonsterType.loadAll(file);
+			CombatGroups.loadAll(file);
 			file.room("maps", _s -> {
 				int size = file.readInt("size");
 				for (int i = 0; i < size; i++) {
@@ -66,7 +68,7 @@ public class WorldState extends GameState {
 	}
 
 	@Override
-	protected void load() {
+	protected void load(String... args) {
 	}
 
 	@Override

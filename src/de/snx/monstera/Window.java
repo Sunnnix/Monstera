@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
+import de.snx.monstera.global_data.Keys;
+
 @SuppressWarnings("serial")
 public class Window extends Canvas {
 

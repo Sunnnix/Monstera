@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.snx.monstera.Game;
-import de.snx.monstera.Registry;
+import de.snx.monstera.global_data.Registry;
 import de.snx.monstera.map.event.Event;
 import de.snx.monstera.state.WorldState;
 import de.snx.psf.PSFFileIO;

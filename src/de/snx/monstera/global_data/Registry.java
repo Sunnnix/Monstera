@@ -1,4 +1,4 @@
-package de.snx.monstera;
+package de.snx.monstera.global_data;
 
 import java.util.ArrayList;
 import java.util.HashMap;

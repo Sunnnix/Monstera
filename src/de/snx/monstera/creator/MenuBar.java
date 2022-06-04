@@ -40,8 +40,9 @@ public class MenuBar extends JMenuBar {
 		bindMenu(menu, new JMenuItem("Switch Map"), KeyStroke.getKeyStroke(VK_O, CTRL_MASK),
 				e -> win.map.selectMapDialog());
 		bindMenu(menu, new JMenuItem("Set Mapsize"), null, e -> win.map.openSizeDialog());
-		bindMenu(menu, new JMenuItem("Edit Monsters"), KeyStroke.getKeyStroke(VK_M, ALT_MASK), e -> new EditMonster(win));
 		bindMenu(menu, new JMenuItem("Edit Abilities"), KeyStroke.getKeyStroke(VK_A, ALT_MASK), e -> new EditAbilities(win));
+		bindMenu(menu, new JMenuItem("Edit Monsters"), KeyStroke.getKeyStroke(VK_M, ALT_MASK), e -> new EditMonster(win));
+		bindMenu(menu, new JMenuItem("Edit Groups"), KeyStroke.getKeyStroke(VK_G, ALT_MASK), e -> new EditGroupsWin(win));
 		return menu;
 	}
 

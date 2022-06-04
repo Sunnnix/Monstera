@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import de.snx.monstera.battle.action.ActionShowText;
 import de.snx.monstera.battle.monstertype.MonsterType;
 import de.snx.monstera.state.BattleState;
+import de.snx.psf.PSFFileIO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,8 @@ public class Battler {
 
 	private String name;
 
+	@Setter
+	@Getter
 	private MonsterType type = MonsterType.MISSINGNO;
 
 	private double hp, atk, def, s_atk, s_def, speed;
@@ -36,6 +39,15 @@ public class Battler {
 		this.level = (byte) level;
 		this.type = type;
 		generateStats();
+	}
+
+	public Battler(PSFFileIO file) {
+		this(file.readByte("level"), MonsterType.getMonsterType(file.readInt("type")));
+	}
+
+	public void save(PSFFileIO file) {
+		file.write("level", level);
+		file.write("type", type.ID);
 	}
 
 	/**
@@ -173,6 +185,11 @@ public class Battler {
 		return name;
 	}
 
+	@Override
+	public String toString() {
+		return level + " - " + type.name;
+	}
+
 	public class AbilityData {
 
 		private Ability ability = Abilities.NULL;
@@ -240,6 +257,10 @@ public class Battler {
 					effectiveness *= 2;
 		}
 		return effectiveness;
+	}
+
+	public void setLevel(int level) {
+		this.level = (byte) level;
 	}
 
 }

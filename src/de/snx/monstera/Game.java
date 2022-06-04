@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.state.BattleState;
 import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.IntroState;

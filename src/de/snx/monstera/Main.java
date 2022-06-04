@@ -1,6 +1,7 @@
 package de.snx.monstera;
 
 import de.snx.monstera.creator.CreatorWindow;
+import de.snx.monstera.global_data.Registry;
 import de.snx.monstera.map.event.*;
 
 public class Main {

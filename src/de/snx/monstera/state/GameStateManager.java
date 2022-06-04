@@ -20,7 +20,7 @@ public class GameStateManager {
 		setState(start);
 	}
 
-	public void setState(GameState state) {
+	public void setState(GameState state, String... args) {
 		String log = "Changed State ";
 		if (this.currentState != null) {
 			log += "from " + currentState.ID + " ";
@@ -28,14 +28,14 @@ public class GameStateManager {
 		}
 		log += "to " + state.ID;
 		this.currentState = state;
-		this.currentState.load();
+		this.currentState.load(args);
 		System.out.println(log);
 	}
 
-	public void setState(int id) {
+	public void setState(int id, String... args) {
 		for (GameState state : this.states)
 			if (state.ID == id) {
-				setState(state);
+				setState(state, args);
 				return;
 			}
 		throw new NoSuchElementException("There is no state with the ID " + id);

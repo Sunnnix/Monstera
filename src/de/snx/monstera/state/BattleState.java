@@ -6,15 +6,15 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import javax.management.openmbean.TabularData;
-
 import de.snx.monstera.Game;
-import de.snx.monstera.Keys;
+import de.snx.monstera.battle.BattleGroup;
 import de.snx.monstera.battle.Battler;
 import de.snx.monstera.battle.Battler.AbilityData;
 import de.snx.monstera.battle.action.ActionEncounter;
 import de.snx.monstera.battle.action.BattleAction;
 import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.global_data.CombatGroups;
+import de.snx.monstera.global_data.Keys;
 import lombok.Setter;
 
 public class BattleState extends GameState {
@@ -38,12 +38,19 @@ public class BattleState extends GameState {
 	}
 
 	@Override
-	protected void load() {
+	protected void load(String... args) {
 		showPlayer = false;
 		showEnemy = false;
 		showPlayerGUI = false;
 		showEnemyGUI = false;
-		enemy[0] = new Battler(3, MonsterType.getMonsterType(1));
+		BattleGroup group;
+		try {
+			group = CombatGroups.getGroup(Integer.parseInt(args[0]));
+		} catch (Exception e) {
+			e.printStackTrace();
+			group = CombatGroups.getGroup(0);
+		}
+		enemy = group.getBattlers();
 		text = new String[0];
 		action.clear();
 		action.add(new ActionEncounter(this, true));

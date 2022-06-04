@@ -1,7 +1,7 @@
 package de.snx.monstera.battle.action;
 
-import de.snx.monstera.Keys;
 import de.snx.monstera.battle.Battler;
+import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.state.BattleState;
 
 public class ActionGainXP extends BattleAction {

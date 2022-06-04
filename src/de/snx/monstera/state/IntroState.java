@@ -2,7 +2,7 @@ package de.snx.monstera.state;
 
 import java.awt.Color;
 
-import de.snx.monstera.Keys;
+import de.snx.monstera.global_data.Keys;
 
 public class IntroState extends GameState {
 

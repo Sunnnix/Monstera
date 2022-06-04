@@ -7,7 +7,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import de.snx.monstera.Registry;
+import de.snx.monstera.global_data.Registry;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.event.Event;
 

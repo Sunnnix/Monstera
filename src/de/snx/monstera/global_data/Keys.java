@@ -1,4 +1,4 @@
-package de.snx.monstera;
+package de.snx.monstera.global_data;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;

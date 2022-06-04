@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.snx.monstera.battle.Abilities;
 import de.snx.monstera.battle.Ability;
-import de.snx.monstera.battle.BattlerImage;
-import de.snx.monstera.battle.Battlers;
+import de.snx.monstera.battle.MonsterImage;
 import de.snx.monstera.battle.Type;
 import de.snx.monstera.creator.Pair;
 import de.snx.psf.PSFFileIO;
@@ -44,9 +42,7 @@ public class MonsterType {
 	}
 
 	public static String[] getMonsterTypes() {
-		return monsters.values().stream()
-				.map(a -> (a.ID >= 100 ? a.ID : a.ID >= 10 ? "0" + a.ID : "00" + a.ID) + " - " + a.name)
-				.collect(Collectors.toList()).toArray(new String[0]);
+		return monsters.values().stream().map(a -> a.toString()).collect(Collectors.toList()).toArray(new String[0]);
 	}
 
 	public static MonsterType getMonsterType(int id) {
@@ -76,6 +72,10 @@ public class MonsterType {
 		return id;
 	}
 
+	public static boolean hasTypes() {
+		return monsters.size() > 0;
+	}
+
 	public final int ID;
 	public final String name;
 
@@ -89,7 +89,7 @@ public class MonsterType {
 
 	public final Pair<Byte, Ability>[] abilities;
 
-	public final BattlerImage img;
+	public final MonsterImage img;
 
 	@SuppressWarnings("unchecked")
 	public MonsterType(PSFFileIO file) {
@@ -118,7 +118,7 @@ public class MonsterType {
 			}
 		});
 		this.abilities = abilities.toArray(new Pair[0]);
-		this.img = Battlers.NULL;
+		this.img = MonsterImage.NULL;
 	}
 
 	public void save(PSFFileIO file) {
@@ -151,7 +151,7 @@ public class MonsterType {
 	@SuppressWarnings("unchecked")
 	private MonsterType(int id, String name, Type type1, Type type2, int hp, int atk, int def, int s_atk, int s_def,
 			int speed, int xpDrop, int xpToNextLevel, int xpInc, double xpInc2, ArrayList<Pair<Byte, Ability>> abilOnLv,
-			BattlerImage img) {
+			MonsterImage img) {
 		this.ID = id;
 		this.name = name;
 		this.type1 = type1;
@@ -178,7 +178,7 @@ public class MonsterType {
 		private int hp = 20, atk = 20, def = 20, s_atk = 20, s_def = 20, speed = 20;
 		private int xpDrop = 8, xpNeed = 25, xpInc1 = 5;
 		private double xpInc2 = 1.1;
-		private BattlerImage img = Battlers.NULL;
+		private MonsterImage img = MonsterImage.NULL;
 		private ArrayList<Pair<Byte, Ability>> abilities = new ArrayList<>();
 
 		public Builder(int id, String name) {
@@ -214,7 +214,7 @@ public class MonsterType {
 			return this;
 		}
 
-		public Builder setImage(BattlerImage img) {
+		public Builder setImage(MonsterImage img) {
 			this.img = img;
 			return this;
 		}
@@ -237,6 +237,11 @@ public class MonsterType {
 			if (abLv.object1 == level)
 				a.add(abLv.object2);
 		return a.toArray(new Ability[0]);
+	}
+
+	@Override
+	public String toString() {
+		return (ID >= 100 ? ID : ID >= 10 ? "0" + ID : "00" + ID) + " - " + name;
 	}
 
 }

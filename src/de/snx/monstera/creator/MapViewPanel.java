@@ -24,6 +24,7 @@ import javax.swing.filechooser.FileFilter;
 
 import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -153,6 +154,7 @@ public class MapViewPanel extends JPanel {
 		try (PSFFileIO file = new PSFFileIO(mapData, "r")) {
 			Ability.loadAll(file);
 			MonsterType.loadAll(file);
+			CombatGroups.loadAll(file);
 			file.room("maps", _s -> {
 				int size = file.readInt("size");
 				for (int i = 0; i < size; i++) {
@@ -161,7 +163,7 @@ public class MapViewPanel extends JPanel {
 						maps.add(map);
 					});
 					if (i == 0)
-						selectedMap = maps.get(0);
+						selectMap(0);
 				}
 			});
 			file.room("player", _s -> {
@@ -191,6 +193,7 @@ public class MapViewPanel extends JPanel {
 		try (PSFFileIO file = new PSFFileIO("Creator/output/" + name + ".map", "w")) {
 			Ability.saveAll(file);
 			MonsterType.saveAll(file);
+			CombatGroups.saveAll(file);
 			file.room("player", _s -> {
 				file.write("map_id", pMapID);
 				file.write("x", player.getX());
