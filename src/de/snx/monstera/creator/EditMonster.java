@@ -14,7 +14,7 @@ import java.util.Arrays;
 import javax.swing.*;
 
 import de.snx.monstera.battle.Ability;
-import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.battle.MonsterType;
 
 @SuppressWarnings("serial")
 public class EditMonster extends JDialog {

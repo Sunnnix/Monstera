@@ -3,7 +3,6 @@ package de.snx.monstera.battle;
 import java.awt.image.BufferedImage;
 
 import de.snx.monstera.battle.action.ActionShowText;
-import de.snx.monstera.battle.monstertype.MonsterType;
 import de.snx.monstera.state.BattleState;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -99,7 +98,7 @@ public class Battler {
 		Ability[] ability = type.getAbilitiesOnLevelUp(level);
 		for (Ability a2l : ability)
 			for (int i = 0; i < abilities.length; i++)
-				if (abilities[i].ability.equals(Abilities.NULL)) {
+				if (abilities[i].ability.equals(Ability.EMPTY_ABILITY)) {
 					abilities[i] = new AbilityData(a2l);
 					if (state != null)
 						state.setNextAction(new ActionShowText(state, getName() + " has learned " + a2l.name + "!"));
@@ -192,7 +191,7 @@ public class Battler {
 
 	public class AbilityData {
 
-		private Ability ability = Abilities.NULL;
+		private Ability ability = Ability.EMPTY_ABILITY;
 		@Getter
 		private int ap, apMax;
 
@@ -205,13 +204,13 @@ public class Battler {
 		}
 
 		public String getName() {
-			if (ability == Abilities.NULL)
+			if (ability == Ability.EMPTY_ABILITY)
 				return "---";
 			return ability.name;
 		}
 
 		public Type getType() {
-			if (ability == Abilities.NULL)
+			if (ability == Ability.EMPTY_ABILITY)
 				return null;
 			return ability.type;
 		}

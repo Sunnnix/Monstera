@@ -17,6 +17,10 @@ public class ActionShowText extends BattleAction {
 		super(state);
 		this.text = text;
 	}
+	
+	@Override
+	public void prepare() {
+	}
 
 	@Override
 	public void keys() {

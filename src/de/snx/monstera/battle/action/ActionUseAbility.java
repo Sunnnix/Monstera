@@ -10,17 +10,27 @@ public class ActionUseAbility extends BattleAction {
 	private AbilityData ability;
 	private boolean crit;
 	private double effectiveness;
-	private final int TOTAL_DAMAGE;
+	private int total_damage;
 	private double hp_animation, animTicks = .25;
-	private boolean first;
+	private boolean player, first;
 
-	public ActionUseAbility(BattleState state, Battler attacker, Battler target, AbilityData ability, boolean first) {
+	public ActionUseAbility(BattleState state, boolean player, AbilityData ability, boolean first) {
 		super(state);
-		this.attacker = attacker;
-		this.target = target;
 		this.ability = ability;
 		this.first = first;
-		this.TOTAL_DAMAGE = calculateDamage();
+		this.player = player;
+	}
+
+	@Override
+	public void prepare() {
+		if (player) {
+			attacker = state.getPlayer();
+			target = state.getEnemy();
+		} else {
+			attacker = state.getEnemy();
+			target = state.getPlayer();
+		}
+		this.total_damage = calculateDamage();
 	}
 
 	@Override
@@ -29,11 +39,11 @@ public class ActionUseAbility extends BattleAction {
 
 	@Override
 	public void update() {
-		if (hp_animation < TOTAL_DAMAGE) {
+		if (hp_animation < total_damage) {
 			hp_animation += animTicks;
 			target.setGraphicHPMod(-hp_animation);
 		} else {
-			target.setDamage(TOTAL_DAMAGE);
+			target.setDamage(total_damage);
 			target.setGraphicHPMod(0);
 			if (target.getHp() == 0) {
 				state.clearAction();
@@ -52,7 +62,7 @@ public class ActionUseAbility extends BattleAction {
 	}
 
 	public int calculateDamage() {
-		double dmg = ability.getPower() / 100d * attacker.getAtk() * 4.5;
+		double dmg = ability.getPower() / 100d * attacker.getAtk() * 9;
 		dmg -= target.getDef() / 2;
 		crit = Math.random() < .25;
 		if (crit)

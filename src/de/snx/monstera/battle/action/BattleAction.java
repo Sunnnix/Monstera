@@ -13,6 +13,8 @@ public abstract class BattleAction {
 		this.state = state;
 	}
 
+	public abstract void prepare();
+
 	public abstract void keys();
 
 	public abstract void update();

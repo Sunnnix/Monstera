@@ -2,6 +2,9 @@ package de.snx.monstera.battle.action;
 
 import de.snx.monstera.state.BattleState;
 
+/**
+ * First Animation to blend in player and enemy
+ */
 public class ActionEncounter extends BattleAction {
 
 	private boolean first;
@@ -10,6 +13,10 @@ public class ActionEncounter extends BattleAction {
 	public ActionEncounter(BattleState state, boolean first) {
 		super(state);
 		this.first = first;
+	}
+	
+	@Override
+	public void prepare() {
 	}
 
 	@Override

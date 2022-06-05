@@ -17,9 +17,21 @@ public class ActionGainXP extends BattleAction {
 	}
 
 	@Override
+	public void prepare() {
+
+	}
+
+	@Override
 	public void keys() {
-		if (waitForInput && Keys.CONFIRM.isPressed())
+		if (waitForInput && Keys.CONFIRM.isPressed()) {
+			if (state.hasNextMonster(false)) {
+				state.nextEnemy();
+				state.addNextAction(new ActionShowText(state, "Enemy sent out " + state.getEnemy().getName() + "!"));
+				state.addNextAction(new ActionUseNextMonster(state, false, state.getEnemyIndex()));
+				state.addNextAction(new ActionPlayerChoose(state));
+			}
 			finished = true;
+		}
 	}
 
 	@Override

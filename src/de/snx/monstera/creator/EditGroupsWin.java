@@ -12,7 +12,7 @@ import javax.swing.*;
 
 import de.snx.monstera.battle.BattleGroup;
 import de.snx.monstera.battle.Battler;
-import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
 
 @SuppressWarnings("serial")

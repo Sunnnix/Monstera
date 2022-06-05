@@ -1,4 +1,4 @@
-package de.snx.monstera.battle.monstertype;
+package de.snx.monstera.battle;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.snx.monstera.battle.Ability;
-import de.snx.monstera.battle.MonsterImage;
-import de.snx.monstera.battle.Type;
 import de.snx.monstera.creator.Pair;
 import de.snx.psf.PSFFileIO;
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 import de.snx.monstera.Game;
 import de.snx.monstera.battle.Ability;
-import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.map.Entity;

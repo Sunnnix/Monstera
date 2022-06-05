@@ -10,31 +10,47 @@ import de.snx.monstera.Game;
 import de.snx.monstera.battle.BattleGroup;
 import de.snx.monstera.battle.Battler;
 import de.snx.monstera.battle.Battler.AbilityData;
+import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.battle.action.ActionEncounter;
 import de.snx.monstera.battle.action.BattleAction;
-import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.battle.action.IDrawable;
 import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.global_data.Keys;
 import lombok.Setter;
 
 public class BattleState extends GameState {
 
-	private Battler[] player = new Battler[6], enemy = new Battler[6];
+	private Battler[] player, enemy;
 
 	// Textbox
 	private String[] text = new String[0];
 
+	/**
+	 * The actions control the entire battle
+	 */
 	private ArrayList<BattleAction> action = new ArrayList<>();
 
+	private BattleAction runAction;
+
+	/**
+	 * Graphical variables
+	 */
 	@Setter
 	private boolean showPlayer, showEnemy, showPlayerGUI, showEnemyGUI;
 	@Setter
 	private int pOffsetX, pOffsetY, eOffsetX, eOffsetY;
 
+	/**
+	 * monster on field (index of array)
+	 */
+	private int pOnField, eOnField;
+
 	public BattleState(int id) {
 		super(id);
 		setBackgroundColor(Color.WHITE);
-		player[0] = new Battler(5, MonsterType.getMonsterType(1));
+		// TODO currenrly hardcoded
+		player = new Battler[] { new Battler(5, MonsterType.getMonsterType(1)),
+				new Battler(12, MonsterType.getMonsterType(2)), new Battler(100, MonsterType.getMonsterType(0)) };
 	}
 
 	@Override
@@ -52,6 +68,7 @@ public class BattleState extends GameState {
 		}
 		enemy = group.getBattlers();
 		text = new String[0];
+		runAction = null;
 		action.clear();
 		action.add(new ActionEncounter(this, true));
 	}
@@ -61,12 +78,14 @@ public class BattleState extends GameState {
 		renderMonster(gsm, g);
 		renderTextBox(gsm, g);
 		renderGUI(gsm, g);
-		addDebugText("Action: " + (action.isEmpty() ? "-" : action.get(0).getClass().getSimpleName()));
+		if (runAction != null && runAction instanceof IDrawable)
+			((IDrawable) runAction).render(gsm, g);
+		addDebugText("Action: " + (runAction == null ? "-" : runAction.getClass().getSimpleName()));
 	}
 
 	private void renderMonster(GameStateManager gsm, Graphics2D g) {
-		BufferedImage b1 = enemy[0].getImage(0);
-		BufferedImage b2 = player[0].getImage(1);
+		BufferedImage b1 = enemy[eOnField].getImage(0);
+		BufferedImage b2 = player[pOnField].getImage(1);
 		int b1X, b1Y, b2X, b2Y;
 		b1X = gsm.windowWidth() - 180 + eOffsetX;
 		b2X = 130 + pOffsetX;
@@ -107,7 +126,7 @@ public class BattleState extends GameState {
 			g.setColor(Color.WHITE);
 			g.fillRect(x, y, 300, 120);
 
-			b = enemy[0];
+			b = enemy[eOnField];
 
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.PLAIN, 32));
@@ -132,7 +151,7 @@ public class BattleState extends GameState {
 			g.setColor(Color.WHITE);
 			g.fillRect(x, y, 300, 120);
 
-			b = player[0];
+			b = player[pOnField];
 
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.PLAIN, 32));
@@ -165,12 +184,15 @@ public class BattleState extends GameState {
 
 	@Override
 	protected void update(GameStateManager gsm, int ticks) {
-		if (action.isEmpty())
+		if ((runAction == null || runAction.isFinished()) && action.isEmpty())
 			gsm.setState(2);
 		else {
-			BattleAction action = this.action.get(0);
-			action.update();
-			if (action.isFinished())
+			if (runAction == null || runAction.isFinished()) {
+				runAction = action.get(0);
+				runAction.prepare();
+			}
+			runAction.update();
+			if (runAction.isFinished())
 				this.action.remove(0);
 		}
 	}
@@ -179,8 +201,8 @@ public class BattleState extends GameState {
 	protected void keyEvents(GameStateManager gsm) {
 		if (Keys.DEBUG.isPressed())
 			drawDebug = !drawDebug;
-		if (!action.isEmpty())
-			action.get(0).keys();
+		if (runAction != null)
+			runAction.keys();
 	}
 
 	public void setText(String[] text) {
@@ -188,11 +210,11 @@ public class BattleState extends GameState {
 	}
 
 	public AbilityData[] getPlayerMoves() {
-		return player[0].getAbilitys();
+		return player[pOnField].getAbilitys();
 	}
 
 	public AbilityData[] getEnemyMoves() {
-		return enemy[0].getAbilitys();
+		return enemy[eOnField].getAbilitys();
 	}
 
 	public void setNextAction(BattleAction action) {
@@ -204,11 +226,11 @@ public class BattleState extends GameState {
 	}
 
 	public Battler getPlayer() {
-		return player[0];
+		return player[pOnField];
 	}
 
 	public Battler getEnemy() {
-		return enemy[0];
+		return enemy[eOnField];
 	}
 
 	public void removeNextAction() {
@@ -223,4 +245,41 @@ public class BattleState extends GameState {
 		action.clear();
 		action.add(a);
 	}
+
+	public boolean hasNextMonster(boolean player) {
+		Battler[] b = player ? this.player : enemy;
+		for (Battler battler : b)
+			if (battler.getHp() != 0)
+				return true;
+		return false;
+	}
+
+	public void nextEnemy() {
+		eOnField++;
+	}
+
+	public Battler[] getPlayerBattlers() {
+		return player;
+	}
+
+	public void setPlayerBattler(int bIndex) {
+		pOnField = bIndex;
+	}
+
+	public void setEnemyBattler(int bIndex) {
+		eOnField = bIndex;
+	}
+
+	public int getEnemyIndex() {
+		return eOnField;
+	}
+
+	public Battler getPlayer(int index) {
+		return player[index];
+	}
+
+	public Battler getEnemy(int index) {
+		return enemy[index];
+	}
+
 }

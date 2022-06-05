@@ -23,7 +23,7 @@ import javax.swing.JSeparator;
 import javax.swing.filechooser.FileFilter;
 
 import de.snx.monstera.battle.Ability;
-import de.snx.monstera.battle.monstertype.MonsterType;
+import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
