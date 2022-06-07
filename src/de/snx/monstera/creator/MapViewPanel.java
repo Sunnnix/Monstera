@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -25,6 +26,7 @@ import javax.swing.filechooser.FileFilter;
 import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
+import de.snx.monstera.global_data.ResourceStrings;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -111,6 +113,19 @@ public class MapViewPanel extends JPanel {
 		openSizeDialog();
 	}
 
+	public void deleteMap() {
+		int a = JOptionPane.showConfirmDialog(win, "Delete current Map?");
+		if (a == JOptionPane.OK_OPTION) {
+			maps.remove(selectedMap);
+			if (maps.size() > 0)
+				selectedMap = maps.get(0);
+			else
+				selectedMap = null;
+			win.revalidate();
+			win.repaint();
+		}
+	}
+
 	public void selectMapDialog() {
 		if (maps.size() == 0)
 			JOptionPane.showMessageDialog(win, "There is no map to select");
@@ -132,54 +147,148 @@ public class MapViewPanel extends JPanel {
 		win.repaint();
 	}
 
+//	public void openProjectOLD() {
+//		JFileChooser chooser = new JFileChooser("Creator/output");
+//		chooser.setFileFilter(new FileFilter() {
+//
+//			@Override
+//			public String getDescription() {
+//				return "Map File (.map)";
+//			}
+//
+//			@Override
+//			public boolean accept(File f) {
+//				return f.isDirectory() || f.getName().endsWith(".map");
+//			}
+//		});
+//		chooser.showOpenDialog(win);
+//		File mapData = chooser.getSelectedFile();
+//		if (mapData == null)
+//			return;
+//		maps.clear();
+//		try (PSFFileIO file = new PSFFileIO(mapData, "r")) {
+//			Ability.loadAll(file);
+//			MonsterType.loadAll(file);
+//			CombatGroups.loadAll(file);
+//			file.room("maps", _s -> {
+//				int size = file.readInt("size");
+//				for (int i = 0; i < size; i++) {
+//					file.room("m_" + i, __s -> {
+//						Map map = new Map(file, win.tileset);
+//						maps.add(map);
+//					});
+//					if (i == 0)
+//						selectMap(0);
+//				}
+//			});
+//			file.room("player", _s -> {
+//				pMapID = file.readInt("map_id");
+//				if (pMapID >= 0) {
+//					player.setPos(file.readDouble("x"), file.readDouble("y"));
+//					player.setDirection(file.readInt("direction"));
+//					setPlayerStart((int) player.getX(), (int) player.getY(), pMapID);
+//				}
+//			});
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		win.revalidate();
+//		win.repaint();
+//	}
+
 	public void openProject() {
 		JFileChooser chooser = new JFileChooser("Creator/output");
 		chooser.setFileFilter(new FileFilter() {
 
 			@Override
 			public String getDescription() {
-				return "Map File (.map)";
+				return "Monstera Game (.mgame)";
 			}
 
 			@Override
 			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().endsWith(".map");
+				return f.isDirectory() || f.getName().endsWith(".mgame");
 			}
 		});
 		chooser.showOpenDialog(win);
-		File mapData = chooser.getSelectedFile();
-		if (mapData == null)
+		File projectF = chooser.getSelectedFile();
+		if (projectF == null)
 			return;
 		maps.clear();
-		try (PSFFileIO file = new PSFFileIO(mapData, "r")) {
-			Ability.loadAll(file);
-			MonsterType.loadAll(file);
-			CombatGroups.loadAll(file);
-			file.room("maps", _s -> {
-				int size = file.readInt("size");
-				for (int i = 0; i < size; i++) {
-					file.room("m_" + i, __s -> {
-						Map map = new Map(file, win.tileset);
-						maps.add(map);
-					});
-					if (i == 0)
-						selectMap(0);
-				}
-			});
+		int[] map_ids = new int[0];
+		try (PSFFileIO file = new PSFFileIO(projectF, "r")) {
+			map_ids = file.readIntArray("maps");
 			file.room("player", _s -> {
 				pMapID = file.readInt("map_id");
-				if (pMapID >= 0) {
-					player.setPos(file.readDouble("x"), file.readDouble("y"));
-					player.setDirection(file.readInt("direction"));
-					setPlayerStart((int) player.getX(), (int) player.getY(), pMapID);
-				}
+				player.setPos(file.readDouble("x"), file.readDouble("y"));
+				player.setDirection(file.readInt("direction"));
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		win.revalidate();
-		win.repaint();
+		String folder = projectF.getAbsolutePath().replace(".mgame", "");
+		try (PSFFileIO file = new PSFFileIO(new File(folder, "/abilities.dat"), "r")) {
+			Ability.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO(new File(folder, "/monsters.dat"), "r")) {
+			MonsterType.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO(new File(folder, "/groups.dat"), "r")) {
+			CombatGroups.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (int map : map_ids) {
+			try (PSFFileIO file = new PSFFileIO(new File(folder, "/map" + map + ".dat"), "r")) {
+				maps.add(new Map(file, win.tileset));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (!maps.isEmpty()) {
+			selectedMap = maps.get(0);
+			win.revalidate();
+			win.repaint();
+		}
 	}
+
+//	public void saveProjectOLD() {
+//		if (pMapID == -1 || !maps.stream().anyMatch(m -> m.ID == pMapID)) {
+//			JOptionPane.showMessageDialog(win, "The player is not set!");
+//			return;
+//		}
+//		String name = JOptionPane.showInputDialog(win, "Project name:");
+//		if (name == null || name.isEmpty())
+//			return;
+//		HashSet<String> usedKeys = new HashSet<>();
+//		try (PSFFileIO file = new PSFFileIO("Creator/output/" + name + ".map", "w")) {
+//			Ability.saveAll(file);
+//			MonsterType.saveAll(file);
+//			CombatGroups.saveAll(file);
+//			file.room("player", _s -> {
+//				file.write("map_id", pMapID);
+//				file.write("x", player.getX());
+//				file.write("y", player.getY());
+//				file.write("direction", player.getDirection());
+//			});
+//			file.room("maps", _s -> {
+//				file.write("size", maps.size());
+//				for (int i = 0; i < maps.size(); i++) {
+//					Map map = maps.get(i);
+//					file.room("m_" + i, __s -> {
+//						map.save(file, usedKeys, win.tileset);
+//					});
+//				}
+//			});
+//			file.write("tile_res", usedKeys.toArray(new String[0]));
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public void saveProject() {
 		if (pMapID == -1 || !maps.stream().anyMatch(m -> m.ID == pMapID)) {
@@ -190,28 +299,40 @@ public class MapViewPanel extends JPanel {
 		if (name == null || name.isEmpty())
 			return;
 		HashSet<String> usedKeys = new HashSet<>();
-		try (PSFFileIO file = new PSFFileIO("Creator/output/" + name + ".map", "w")) {
-			Ability.saveAll(file);
-			MonsterType.saveAll(file);
-			CombatGroups.saveAll(file);
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + ".mgame", "w")) {
+			file.write("maps", (ArrayList<?>) maps.stream().map(m -> m.ID).collect(Collectors.toList()));
 			file.room("player", _s -> {
 				file.write("map_id", pMapID);
 				file.write("x", player.getX());
 				file.write("y", player.getY());
 				file.write("direction", player.getDirection());
 			});
-			file.room("maps", _s -> {
-				file.write("size", maps.size());
-				for (int i = 0; i < maps.size(); i++) {
-					Map map = maps.get(i);
-					file.room("m_" + i, __s -> {
-						map.save(file, usedKeys, win.tileset);
-					});
-				}
-			});
-			file.write("tile_res", usedKeys.toArray(new String[0]));
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + "/abilities.dat", "w")) {
+			Ability.saveAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + "/monsters.dat", "w")) {
+			MonsterType.saveAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + "/groups.dat", "w")) {
+			CombatGroups.saveAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(ResourceStrings.CRT_BASIC_PATH + name + "/map" + 1 + ".dat");
+		for (Map map : maps) {
+			try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + "/map" + map.ID + ".dat",
+					"w")) {
+				map.save(file, usedKeys, win.tileset);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

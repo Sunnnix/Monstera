@@ -26,7 +26,7 @@ public class Battler {
 
 	@Getter
 	@Setter
-	private int xp, xpToNextLv = 25, xpDrop = 28;
+	private int xp, xpToNextLv, xpDrop;
 
 	private AbilityData[] abilities = new AbilityData[] { new AbilityData(null), new AbilityData(null),
 			new AbilityData(null), new AbilityData(null) };
@@ -70,6 +70,8 @@ public class Battler {
 			s_atk = type.s_atk / 3;
 			s_def = type.s_def / 3;
 			speed = type.speed / 3;
+			xpToNextLv = type.xpNeed;
+			xpDrop = type.xpDrop;
 		} else {
 			int[] prefState = new int[6];
 			prefState[0] = (int) hp;
@@ -94,6 +96,11 @@ public class Battler {
 			increase[3] = (int) (s_atk - prefState[3]);
 			increase[4] = (int) (s_def - prefState[4]);
 			increase[5] = (int) (speed - prefState[5]);
+			xpToNextLv = (int) (xpToNextLv * type.xpInc2 + type.xpInc);
+			if ((int) (xpDrop * 1.05) == xpDrop)
+				xpDrop++;
+			else
+				xpDrop *= 1.05;
 		}
 		Ability[] ability = type.getAbilitiesOnLevelUp(level);
 		for (Ability a2l : ability)
