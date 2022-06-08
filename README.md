@@ -2,6 +2,6 @@
 A Pokemon like engine with map editor
 
 This project requires:
-- Crash report - https://github.com/Sunnnix/CrashReport
-- PSFFileIO V3 - https://github.com/Sunnnix/PSFFileIO
-- lombok - https://projectlombok.org/download
+- <a href="https://github.com/Sunnnix/CrashReport">Crash report</a>
+- <a href="https://github.com/Sunnnix/PSFFileIO">PSFFileIO V3</a>
+- <a href="https://projectlombok.org/download">lombok</a>
