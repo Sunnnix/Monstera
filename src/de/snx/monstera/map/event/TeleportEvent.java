@@ -1,5 +1,6 @@
 package de.snx.monstera.map.event;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -19,21 +20,26 @@ import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.WorldState;
 import de.snx.psf.PSFFileIO;
 
+/**
+ * Is used to teleport a entity to another location in the map
+ */
 public class TeleportEvent extends Event {
 
 	public static final String REGISTRY_NAME = "TeleportEvent";
+	public static final String[] S_DIRECTIONS = new String[] { "Retain", "North", "East", "South", "West" };
 
+	private int entityID;
 	private int x, y;
 	private int direction = -1;
 	private boolean animate = true;
 	private int phase = 0, timer, maxTime = 15;
-	private int entityID;
 
 	public TeleportEvent(PSFFileIO file) {
 		super(file);
+		entityID = file.readInt("entity");
 		x = file.readInt("x");
 		y = file.readInt("y");
-		entityID = file.readInt("entity");
+		direction = file.readInt("direction");
 		animate = file.readBoolean("animate");
 	}
 
@@ -53,8 +59,11 @@ public class TeleportEvent extends Event {
 	public void update(Map map, WorldState world, GameStateManager gsm) {
 		if (!animate || phase == 1 && timer == 0) {
 			Entity e = map.getEntity(entityID);
-			if (e != null)
+			if (e != null) {
 				e.setPos(x, y);
+				if (direction != -1)
+					e.setDirection(direction);
+			}
 			if (!animate)
 				finished = true;
 		} else {
@@ -83,14 +92,15 @@ public class TeleportEvent extends Event {
 
 	@Override
 	public String getEventInfo() {
-		return entityID + " to " + x + ", " + y;
+		return entityID + " to (" + x + ", " + y + ") Direction: " + getDirectionString();
 	}
 
 	@Override
 	public void onSave(PSFFileIO file) {
+		file.write("entity", entityID);
 		file.write("x", x);
 		file.write("y", y);
-		file.write("entity", entityID);
+		file.write("direction", direction);
 		file.write("animate", animate);
 	}
 
@@ -98,10 +108,19 @@ public class TeleportEvent extends Event {
 	public void interact(Map map) {
 	}
 
+	private String getDirectionString() {
+		if (direction + 1 < 0 || direction + 1 >= S_DIRECTIONS.length)
+			return "";
+		else
+			return S_DIRECTIONS[direction + 1];
+	}
+
 	@Override
 	public Pair<JPanel, Runnable> getEditorDialog(CreatorWindow win) {
-		JPanel panel = new JPanel(new GridLayout(0, 2));
+		JPanel panel = new JPanel(new BorderLayout());
+		JPanel grid = new JPanel(new GridLayout(0, 2));
 		JTextField f_x, f_y;
+		JComboBox<String> direction;
 		JCheckBox anim;
 		ArrayList<Entity> es = win.map.selectedMap.entitys;
 		Entity[] aes = new Entity[es.size() + 1];
@@ -111,22 +130,29 @@ public class TeleportEvent extends Event {
 			else
 				aes[i] = es.get(i - 1);
 		JComboBox<Entity> entitys = new JComboBox<Entity>(aes);
-		panel.add(new JLabel("X:"));
-		panel.add(f_x = new JTextField(5));
+		panel.add(new JLabel("Entity to Teleport:"), BorderLayout.NORTH);
+		panel.add(entitys, BorderLayout.CENTER);
+		grid.add(new JLabel("X:"));
+		grid.add(f_x = new JTextField(5));
 		f_x.setText(Integer.toString(x));
-		panel.add(new JLabel("Y:"));
-		panel.add(f_y = new JTextField(5));
+		grid.add(new JLabel("Y:"));
+		grid.add(f_y = new JTextField(5));
 		f_y.setText(Integer.toString(y));
-		panel.add(new JLabel("Animate"));
-		panel.add(anim = new JCheckBox());
+		grid.add(new JLabel("Direction:"));
+		direction = new JComboBox<>(S_DIRECTIONS);
+		grid.add(direction);
+		grid.add(new JLabel("Animate:"));
+		grid.add(anim = new JCheckBox());
 		anim.setSelected(animate);
 		anim.setSelected(true);
-		panel.add(entitys);
+		panel.add(grid, BorderLayout.SOUTH);
 		Runnable apply = () -> {
 			try {
+				this.entityID = ((Entity) entitys.getSelectedItem()).id;
 				this.x = Integer.parseInt(f_x.getText());
 				this.y = Integer.parseInt(f_y.getText());
-				this.entityID = ((Entity) entitys.getSelectedItem()).id;
+				this.direction = direction.getSelectedIndex();
+				this.animate = anim.isSelected();
 			} catch (Exception e) {
 				System.err.println("Invalid input.");
 			}

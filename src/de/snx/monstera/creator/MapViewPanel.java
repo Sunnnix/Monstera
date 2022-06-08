@@ -56,6 +56,7 @@ public class MapViewPanel extends JPanel {
 
 	public MapViewPanel(CreatorWindow win) {
 		this.win = win;
+		player.name = "Player";
 		setBackground(Color.BLACK);
 		MListener mL = new MListener();
 		addMouseListener(mL);

@@ -196,4 +196,8 @@ public class WorldState extends GameState {
 		currentMap.addEntity(player);
 	}
 
+	public Entity getEntity(int i) {
+		return currentMap.getEntity(i);
+	}
+
 }
