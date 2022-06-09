@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
 @SuppressWarnings("serial")
@@ -31,7 +32,10 @@ public class MenuBar extends JMenuBar {
 	private JMenu initFileMenu(JMenu menu) {
 		bindMenu(menu, new JMenuItem("New Project"), null, e -> win.map.newMap());
 		bindMenu(menu, new JMenuItem("Open Project"), null, e -> win.map.openProject());
-		bindMenu(menu, new JMenuItem("Save Project"), KeyStroke.getKeyStroke(VK_S, CTRL_MASK), e -> win.map.saveProject());
+		bindMenu(menu, new JMenuItem("Save Project"), KeyStroke.getKeyStroke(VK_S, CTRL_MASK),
+				e -> win.map.saveProject());
+		menu.add(new JSeparator());
+		bindMenu(menu, new JMenuItem("Exit"), null, e -> System.exit(0));
 		return menu;
 	}
 
@@ -40,10 +44,15 @@ public class MenuBar extends JMenuBar {
 		bindMenu(menu, new JMenuItem("Switch Map"), KeyStroke.getKeyStroke(VK_O, CTRL_MASK),
 				e -> win.map.selectMapDialog());
 		bindMenu(menu, new JMenuItem("Delete Map"), KeyStroke.getKeyStroke(VK_D, CTRL_MASK), e -> win.map.deleteMap());
+		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Set Mapsize"), null, e -> win.map.openSizeDialog());
-		bindMenu(menu, new JMenuItem("Edit Abilities"), KeyStroke.getKeyStroke(VK_A, ALT_MASK), e -> new EditAbilities(win));
-		bindMenu(menu, new JMenuItem("Edit Monsters"), KeyStroke.getKeyStroke(VK_M, ALT_MASK), e -> new EditMonster(win));
-		bindMenu(menu, new JMenuItem("Edit Groups"), KeyStroke.getKeyStroke(VK_G, ALT_MASK), e -> new EditGroupsWin(win));
+		menu.add(new JSeparator());
+		bindMenu(menu, new JMenuItem("Edit Abilities"), KeyStroke.getKeyStroke(VK_A, ALT_MASK),
+				e -> new EditAbilities(win));
+		bindMenu(menu, new JMenuItem("Edit Monsters"), KeyStroke.getKeyStroke(VK_M, ALT_MASK),
+				e -> new EditMonster(win));
+		bindMenu(menu, new JMenuItem("Edit Groups"), KeyStroke.getKeyStroke(VK_G, ALT_MASK),
+				e -> new EditGroupsWin(win));
 		return menu;
 	}
 
@@ -52,17 +61,17 @@ public class MenuBar extends JMenuBar {
 		group.add(bindMenu(menu, new JMenuItem("Draw Tiles"), KeyStroke.getKeyStroke(VK_F1, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(true);
-			win.map.setMode(MapViewPanel.Mode.DRAW_TILES);
+			win.setMode(MapViewPanel.Mode.DRAW_TILES);
 		}));
 		group.add(bindMenu(menu, new JMenuItem("Set Blocking"), KeyStroke.getKeyStroke(VK_F2, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(true);
-			win.map.setMode(MapViewPanel.Mode.SET_BLOCKING);
+			win.setMode(MapViewPanel.Mode.SET_BLOCKING);
 		}));
 		group.add(bindMenu(menu, new JMenuItem("Entity"), KeyStroke.getKeyStroke(VK_F3, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(true);
-			win.map.setMode(MapViewPanel.Mode.ENTITY);
+			win.setMode(MapViewPanel.Mode.ENTITY);
 		}));
 		return menu;
 	}
@@ -72,19 +81,19 @@ public class MenuBar extends JMenuBar {
 		JMenuItem item = bindMenu(menu, new JMenuItem("Layer 1 (Floor)"), KeyStroke.getKeyStroke(VK_1, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(false);
-			win.map.selectLayer(0);
+			win.setLayer(0);
 		});
 		item.setSelected(true);
 		group.add(item);
 		group.add(bindMenu(menu, new JMenuItem("Layer 2 (Ground)"), KeyStroke.getKeyStroke(VK_2, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(false);
-			win.map.selectLayer(1);
+			win.setLayer(1);
 		}));
 		group.add(bindMenu(menu, new JMenuItem("Layer 3 (Above)"), KeyStroke.getKeyStroke(VK_3, 0), e -> {
 			group.forEach(i -> i.setSelected(false));
 			((JMenuItem) e.getSource()).setSelected(false);
-			win.map.selectLayer(2);
+			win.setLayer(2);
 		}));
 		return menu;
 	}

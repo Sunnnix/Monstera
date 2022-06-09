@@ -30,9 +30,21 @@ import de.snx.monstera.global_data.ResourceStrings;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
+import lombok.Setter;
 
 @SuppressWarnings("serial")
 public class MapViewPanel extends JPanel {
+
+	// TODO copy paste events
+	// TODO more draw options like (fill, square, circle, etc ) in new MenuBar
+	// TODO add to popup default Entitys like (teleport, battle, etc)
+	// TODO remove Playerentity access like doubleclick and add events
+	// TODO add possibility to change the appearance of the editor
+	// TODO set config for above point
+	// TODO fix scrollbar issue on load map
+	// TODO export resources
+	// TODO to point above create game file and combine all res with data
+	// TODO deactivate all Menus when no map is loaded
 
 	private CreatorWindow win;
 
@@ -43,15 +55,24 @@ public class MapViewPanel extends JPanel {
 	private int pMapID = -1;
 	public Entity player = new Entity(0);
 
+	@Getter
+	@Setter
 	private int selectedLayer = 0;
 	@Getter
 	private Mode mode = Mode.DRAW_TILES;
+	@Getter
+	@Setter
+	private Shape shape = Shape.SINGLE;
 	@Getter
 	private boolean drawGrid = true;
 	private Entity selected, dragged;
 
 	public enum Mode {
 		DRAW_TILES, SET_BLOCKING, ENTITY
+	}
+
+	public enum Shape {
+		SINGLE, RECT, CIRCLE, FILL
 	}
 
 	public MapViewPanel(CreatorWindow win) {

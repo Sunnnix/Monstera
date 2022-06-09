@@ -8,12 +8,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import de.snx.monstera.Main;
+import de.snx.monstera.creator.MapViewPanel.Mode;
+import de.snx.monstera.creator.MapViewPanel.Shape;
 
 @SuppressWarnings("serial")
 public class CreatorWindow extends JFrame {
 
 	public static final String TITLE = "Pokemon Creator";
-	
+
 	public MenuBar menu;
 	public ToolBar tools;
 	public TilesetPanel tileset;
@@ -55,6 +57,23 @@ public class CreatorWindow extends JFrame {
 
 	private void loadRes() {
 		Main.registerAll();
+	}
+
+	public void setLayer(int layer) {
+		info.setLayer(layer);
+		map.setSelectedLayer(layer);
+		tools.setLayer(layer);
+	}
+
+	public void setMode(Mode mode) {
+		info.setMode(mode.name());
+		map.setMode(mode);
+		tools.setMode(mode);
+	}
+
+	public void setDrawShape(Shape shape) {
+		map.setShape(shape);
+		tools.setShape(shape);
 	}
 
 }

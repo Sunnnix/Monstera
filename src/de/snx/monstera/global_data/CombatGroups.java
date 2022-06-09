@@ -12,6 +12,7 @@ public class CombatGroups {
 	private static ArrayList<BattleGroup> groups = new ArrayList<>();
 
 	public static void loadAll(PSFFileIO file) {
+		groups.clear();
 		file.room("combat_groups", _s -> {
 			int size = file.readInt("size");
 			for (int i = 0; i < size; i++)
