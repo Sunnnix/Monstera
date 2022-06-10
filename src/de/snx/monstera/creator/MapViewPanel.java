@@ -36,17 +36,20 @@ import lombok.Setter;
 public class MapViewPanel extends JPanel {
 
 	// TODO copy paste events
-	// TODO more draw options like (fill, square, circle, etc ) in new MenuBar
+	// TODO (WIP 2/3) more draw options like (fill, square, circle, etc ) in new
+	// MenuBar
 	// TODO add to popup default Entitys like (teleport, battle, etc)
-	// TODO remove Playerentity access like doubleclick and add events
-	// TODO add possibility to change the appearance of the editor
+	// TODO (WIP 1/2) add possibility to change the appearance of the editor
 	// TODO set config for above point
-	// TODO fix scrollbar issue on load map
 	// TODO export resources
 	// TODO to point above create game file and combine all res with data
 	// TODO deactivate all Menus when no map is loaded
 
 	private CreatorWindow win;
+
+	@Getter
+	@Setter
+	private Color c_grid = Color.CYAN, c_blocking = Color.RED, c_numbers = Color.RED;
 
 	public ArrayList<Map> maps = new ArrayList<>();
 	public Map selectedMap;
@@ -89,7 +92,7 @@ public class MapViewPanel extends JPanel {
 	public void setMapSize(int width, int height) {
 		selectedMap.setSize(width, height);
 		setPreferredSize(new Dimension(width * TilesetPanel.TILESIZE, height * TilesetPanel.TILESIZE));
-		win.revalidate();
+		revalidate();
 		win.repaint();
 	}
 
@@ -130,9 +133,18 @@ public class MapViewPanel extends JPanel {
 				id++;
 			else
 				break;
-		maps.add(new Map(id));
-		selectMap(id);
-		openSizeDialog();
+		try {
+			String name = JOptionPane.showInputDialog("Mapname:");
+			int width = Integer.parseInt(JOptionPane.showInputDialog(win, "Width:", selectedMap.width));
+			int height = Integer.parseInt(JOptionPane.showInputDialog(win, "Height:", selectedMap.height));
+			Map map = new Map(id);
+			map.name = name;
+			map.setSize(width, height);
+			maps.add(map);
+			selectMap(id);
+		} catch (NumberFormatException e) {
+			System.err.println("invalid input.");
+		}
 	}
 
 	public void deleteMap() {
@@ -143,7 +155,7 @@ public class MapViewPanel extends JPanel {
 				selectedMap = maps.get(0);
 			else
 				selectedMap = null;
-			win.revalidate();
+			revalidate();
 			win.repaint();
 		}
 	}
@@ -165,58 +177,14 @@ public class MapViewPanel extends JPanel {
 				selectedMap = map;
 				break;
 			}
-		win.revalidate();
+		if (selectedMap == null)
+			setPreferredSize(new Dimension(0, 0));
+		else
+			setPreferredSize(new Dimension(selectedMap.width * TilesetPanel.TILESIZE,
+					selectedMap.height * TilesetPanel.TILESIZE));
+		revalidate();
 		win.repaint();
 	}
-
-//	public void openProjectOLD() {
-//		JFileChooser chooser = new JFileChooser("Creator/output");
-//		chooser.setFileFilter(new FileFilter() {
-//
-//			@Override
-//			public String getDescription() {
-//				return "Map File (.map)";
-//			}
-//
-//			@Override
-//			public boolean accept(File f) {
-//				return f.isDirectory() || f.getName().endsWith(".map");
-//			}
-//		});
-//		chooser.showOpenDialog(win);
-//		File mapData = chooser.getSelectedFile();
-//		if (mapData == null)
-//			return;
-//		maps.clear();
-//		try (PSFFileIO file = new PSFFileIO(mapData, "r")) {
-//			Ability.loadAll(file);
-//			MonsterType.loadAll(file);
-//			CombatGroups.loadAll(file);
-//			file.room("maps", _s -> {
-//				int size = file.readInt("size");
-//				for (int i = 0; i < size; i++) {
-//					file.room("m_" + i, __s -> {
-//						Map map = new Map(file, win.tileset);
-//						maps.add(map);
-//					});
-//					if (i == 0)
-//						selectMap(0);
-//				}
-//			});
-//			file.room("player", _s -> {
-//				pMapID = file.readInt("map_id");
-//				if (pMapID >= 0) {
-//					player.setPos(file.readDouble("x"), file.readDouble("y"));
-//					player.setDirection(file.readInt("direction"));
-//					setPlayerStart((int) player.getX(), (int) player.getY(), pMapID);
-//				}
-//			});
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		win.revalidate();
-//		win.repaint();
-//	}
 
 	public void openProject() {
 		JFileChooser chooser = new JFileChooser("Creator/output");
@@ -266,51 +234,17 @@ public class MapViewPanel extends JPanel {
 		}
 		for (int map : map_ids) {
 			try (PSFFileIO file = new PSFFileIO(new File(folder, "/map" + map + ".dat"), "r")) {
-				maps.add(new Map(file, win.tileset));
+				Map tmp = new Map(file, win.tileset);
+				if (map == pMapID)
+					tmp.entitys.add(0, player);
+				maps.add(tmp);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		if (!maps.isEmpty()) {
-			selectedMap = maps.get(0);
-			win.revalidate();
-			win.repaint();
-		}
+		if (!maps.isEmpty())
+			selectMap(maps.get(0).ID);
 	}
-
-//	public void saveProjectOLD() {
-//		if (pMapID == -1 || !maps.stream().anyMatch(m -> m.ID == pMapID)) {
-//			JOptionPane.showMessageDialog(win, "The player is not set!");
-//			return;
-//		}
-//		String name = JOptionPane.showInputDialog(win, "Project name:");
-//		if (name == null || name.isEmpty())
-//			return;
-//		HashSet<String> usedKeys = new HashSet<>();
-//		try (PSFFileIO file = new PSFFileIO("Creator/output/" + name + ".map", "w")) {
-//			Ability.saveAll(file);
-//			MonsterType.saveAll(file);
-//			CombatGroups.saveAll(file);
-//			file.room("player", _s -> {
-//				file.write("map_id", pMapID);
-//				file.write("x", player.getX());
-//				file.write("y", player.getY());
-//				file.write("direction", player.getDirection());
-//			});
-//			file.room("maps", _s -> {
-//				file.write("size", maps.size());
-//				for (int i = 0; i < maps.size(); i++) {
-//					Map map = maps.get(i);
-//					file.room("m_" + i, __s -> {
-//						map.save(file, usedKeys, win.tileset);
-//					});
-//				}
-//			});
-//			file.write("tile_res", usedKeys.toArray(new String[0]));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
 
 	public void saveProject() {
 		if (pMapID == -1 || !maps.stream().anyMatch(m -> m.ID == pMapID)) {
@@ -437,9 +371,128 @@ public class MapViewPanel extends JPanel {
 		return e;
 	}
 
+	private void fillTile(int x, int y, int selected, int toFill) {
+		if (selected == toFill)
+			return;
+		if (x < 0 || y < 0 || x >= selectedMap.width || y >= selectedMap.height)
+			return;
+		boolean next = false;
+		switch (selectedLayer) {
+		case 0:
+			if (toFill == -2)
+				toFill = selectedMap.map[x][y].l1;
+			if (selectedMap.map[x][y].l1 == toFill) {
+				selectedMap.map[x][y].l1 = selected;
+				next = true;
+			}
+			break;
+		case 1:
+			if (toFill == -2)
+				toFill = selectedMap.map[x][y].l2;
+			if (selectedMap.map[x][y].l2 == toFill) {
+				selectedMap.map[x][y].l2 = selected;
+				next = true;
+			}
+			break;
+		case 2:
+			if (toFill == -2)
+				toFill = selectedMap.map[x][y].l2;
+			if (selectedMap.map[x][y].l2 == toFill) {
+				selectedMap.map[x][y].l2 = selected;
+				next = true;
+			}
+			break;
+		default:
+			break;
+		}
+		if (next) {
+			fillTile(x + 1, y, selected, toFill);
+			fillTile(x - 1, y, selected, toFill);
+			fillTile(x, y + 1, selected, toFill);
+			fillTile(x, y - 1, selected, toFill);
+		}
+	}
+
+	private void setTilePrev(int x, int y, int x2, int y2, int id) {
+		if (x > x2) {
+			int tmp = x;
+			x = x2;
+			x2 = tmp;
+		}
+		if (y > y2) {
+			int tmp = y;
+			y = y2;
+			y2 = tmp;
+		}
+		if (shape == Shape.RECT) {
+			for (int i = x < 1 ? 0 : x - 1; i <= x2 + 1; i++)
+				for (int j = y < 1 ? 0 : y - 1; j <= y2 + 1; j++)
+					if (i < x || j < y || i > x2 || j > y2)
+						selectedMap.map[i][j].prev = -2;
+					else
+						selectedMap.map[i][j].prev = id;
+		} else {
+
+		}
+		repaint();
+	}
+
+	private void copyTileGraphic(int x, int y) {
+		switch (selectedLayer) {
+		case 0:
+			if (selectedMap.map[x][y].l1 != -1) {
+				win.tileset.selected = selectedMap.map[x][y].l1;
+				win.tileset.repaint();
+			}
+			break;
+		case 1:
+			if (selectedMap.map[x][y].l2 != -1) {
+				win.tileset.selected = selectedMap.map[x][y].l2;
+				win.tileset.repaint();
+			}
+			break;
+		case 2:
+			if (selectedMap.map[x][y].l3 != -1) {
+				win.tileset.selected = selectedMap.map[x][y].l3;
+				win.tileset.repaint();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void setFromPrev() {
+		for (int x = 0; x < selectedMap.width; x++)
+			for (int y = 0; y < selectedMap.height; y++)
+				if (selectedMap.map[x][y].prev != -2) {
+					int id = selectedMap.map[x][y].prev;
+					selectedMap.map[x][y].prev = -2;
+					switch (selectedLayer) {
+					case 0:
+						selectedMap.map[x][y].l1 = id;
+						break;
+					case 1:
+						selectedMap.map[x][y].l2 = id;
+						break;
+					case 2:
+						selectedMap.map[x][y].l3 = id;
+						break;
+					default:
+						break;
+					}
+				}
+		repaint();
+	}
+
+	private void removeEntity(Entity e) {
+		selectedMap.entitys.remove(e);
+		repaint();
+	}
+
 	private class MListener extends MouseAdapter {
 
-		private int pX, pY;
+		private int pX, pY, pressX, pressY;
 		private int pressed = 0;
 
 		@Override
@@ -449,13 +502,26 @@ public class MapViewPanel extends JPanel {
 			y = e.getY() / TilesetPanel.TILESIZE;
 			pX = x;
 			pY = y;
+			pressX = x;
+			pressY = y;
 			if (x >= selectedMap.width || y >= selectedMap.height)
 				return;
-			if (e.getButton() == MouseEvent.BUTTON1) {
+			switch (e.getButton()) {
+			case MouseEvent.BUTTON1:
 				pressed = 1;
 				switch (mode) {
 				case DRAW_TILES:
-					setTile(x, y, win.tileset.selected);
+					switch (shape) {
+					case SINGLE:
+						setTile(x, y, win.tileset.selected);
+						break;
+					case FILL:
+						fillTile(x, y, win.tileset.selected, -2);
+						break;
+					default:
+						setTilePrev(x, y, x, y, win.tileset.selected);
+						break;
+					}
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = true;
@@ -473,42 +539,35 @@ public class MapViewPanel extends JPanel {
 						if (dragged == null) {
 							dragged = createNewEntity(x, y);
 						}
-						openEntityEditor(dragged);
+						if (dragged.id != 0)
+							openEntityEditor(dragged);
 						win.repaint();
 					}
 					break;
 				default:
 					break;
 				}
-			} else if (e.getButton() == MouseEvent.BUTTON2) {
+				break;
+			case MouseEvent.BUTTON2:
 				pressed = 0;
-				switch (selectedLayer) {
-				case 0:
-					if (selectedMap.map[x][y].l1 != -1) {
-						win.tileset.selected = selectedMap.map[x][y].l1;
-						win.repaint();
-					}
-					break;
-				case 1:
-					if (selectedMap.map[x][y].l2 != -1) {
-						win.tileset.selected = selectedMap.map[x][y].l2;
-						win.repaint();
-					}
-					break;
-				case 2:
-					if (selectedMap.map[x][y].l3 != -1) {
-						win.tileset.selected = selectedMap.map[x][y].l3;
-						win.repaint();
-					}
-					break;
-				default:
-					break;
-				}
-			} else if (e.getButton() == MouseEvent.BUTTON3) {
+				copyTileGraphic(x, y);
+				break;
+			case MouseEvent.BUTTON3:
 				pressed = 2;
 				switch (mode) {
 				case DRAW_TILES:
-					setTile(x, y, -1);
+					switch (shape) {
+					case SINGLE:
+						setTile(x, y, -1);
+						break;
+					case FILL:
+						fillTile(x, y, -1, -2);
+						break;
+					default:
+						setTilePrev(x, y, x, y, -1);
+						break;
+					}
+					repaint();
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = false;
@@ -526,6 +585,9 @@ public class MapViewPanel extends JPanel {
 				default:
 					break;
 				}
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -534,9 +596,11 @@ public class MapViewPanel extends JPanel {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (pressed == 1)
 					pressed = 0;
+				setFromPrev();
 			} else if (e.getButton() == MouseEvent.BUTTON3) {
 				if (pressed == 2)
 					pressed = 0;
+				setFromPrev();
 			}
 		}
 
@@ -554,7 +618,16 @@ public class MapViewPanel extends JPanel {
 			if (pressed == 1) {
 				switch (mode) {
 				case DRAW_TILES:
-					setTile(x, y, win.tileset.selected);
+					switch (shape) {
+					case SINGLE:
+						setTile(x, y, win.tileset.selected);
+						break;
+					case FILL:
+						break;
+					default:
+						setTilePrev(pressX, pressY, x, y, win.tileset.selected);
+						break;
+					}
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = true;
@@ -572,7 +645,16 @@ public class MapViewPanel extends JPanel {
 			} else if (pressed == 2) {
 				switch (mode) {
 				case DRAW_TILES:
-					setTile(x, y, -1);
+					switch (shape) {
+					case SINGLE:
+						setTile(x, y, -1);
+						break;
+					case FILL:
+						break;
+					default:
+						setTilePrev(pressX, pressY, x, y, -1);
+						break;
+					}
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = false;
@@ -610,8 +692,9 @@ public class MapViewPanel extends JPanel {
 			if (e != null) {
 				add(new JLabel(e.toString()));
 				add(new JSeparator());
-				add(createMenuItem("Edit", a -> new EntityEditor(win, e)));
-				add(createMenuItem("Remove", a -> selectedMap.entitys.remove(e)));
+				if (e.id != 0)
+					add(createMenuItem("Edit", a -> new EntityEditor(win, e)));
+				add(createMenuItem("Remove", a -> removeEntity(e)));
 				add(new JSeparator());
 			}
 			add(createMenuItem("Add New", a -> openEntityEditor(createNewEntity(x, y))));

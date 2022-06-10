@@ -35,6 +35,8 @@ public class MenuBar extends JMenuBar {
 		bindMenu(menu, new JMenuItem("Save Project"), KeyStroke.getKeyStroke(VK_S, CTRL_MASK),
 				e -> win.map.saveProject());
 		menu.add(new JSeparator());
+		bindMenu(menu, new JMenuItem("Customize Editor"), null, e -> new CustomizerWin(win));
+		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Exit"), null, e -> System.exit(0));
 		return menu;
 	}

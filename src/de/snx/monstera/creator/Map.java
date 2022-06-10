@@ -13,6 +13,7 @@ import de.snx.psf.PSFFileIO;
 
 public class Map {
 
+	private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
 	private static final Color BLUR = new Color(100, 150, 200, 100);
 	private static final Color FRAME = new Color(100, 200, 255, 255);
 	private static final Color P_BLUR = new Color(160, 80, 200, 100);
@@ -140,16 +141,23 @@ public class Map {
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++) {
 				Tile tile = map[x][y];
-				Image i1, i2, i3;
+				Image i1, i2, i3, prev;
 				i1 = win.tileset.getImage(tile.l1);
 				i2 = win.tileset.getImage(tile.l2);
 				i3 = win.tileset.getImage(tile.l3);
 				g.drawImage(i1, x * ts, y * ts, ts, ts, null);
 				g.drawImage(i2, x * ts, y * ts, ts, ts, null);
 				g.drawImage(i3, x * ts, y * ts, ts, ts, null);
+				g.setColor(win.map.getBackground());
+				if (tile.prev == -1)
+					g.fillRect(x * ts, y * ts, ts, ts);
+				else {
+					prev = win.tileset.getImage(tile.prev);
+					g.drawImage(prev, x * ts, y * ts, ts, ts, null);
+				}
 				switch (mapView.getMode()) {
 				case DRAW_TILES:
-					g.setColor(Color.RED);
+					g.setColor(mapView.getC_numbers());
 					g.setFont(new Font("Arial", Font.BOLD, 12));
 					if (i1 != null)
 						g.drawString("1", x * ts + 2, y * ts + 22);
@@ -160,7 +168,8 @@ public class Map {
 					break;
 				case SET_BLOCKING:
 					if (tile.isBlocking) {
-						g.setColor(new Color(255, 0, 0, 100));
+						Color c = mapView.getC_blocking();
+						g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
 						g.fillRect(x * ts, y * ts, ts, ts);
 					}
 					break;
@@ -168,7 +177,7 @@ public class Map {
 					break;
 				}
 				if (mapView.isDrawGrid()) {
-					g.setColor(Color.CYAN);
+					g.setColor(mapView.getC_grid());
 					g.drawRect(x * ts, y * ts, ts, ts);
 				}
 			}
@@ -188,7 +197,7 @@ public class Map {
 				else
 					g.setColor(FRAME);
 				g.drawRect((int) e.getX() * ts + 2, (int) e.getY() * ts + 2, ts - 4, ts - 4);
-				g.setColor(e.id == 0 ? Color.MAGENTA : Color.RED);
+				g.setColor(e.id == 0 ? Color.MAGENTA : mapView.getC_numbers());
 				g.setFont(FONT);
 				String id = e.id == 0 ? "P" : Integer.toString(e.id);
 				g.drawString(id, (int) e.getX() * ts + ts / 2 - g.getFontMetrics().stringWidth(id) / 2,

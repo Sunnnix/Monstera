@@ -1,6 +1,5 @@
 package de.snx.monstera.creator;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -20,7 +19,6 @@ import de.snx.monstera.creator.MapViewPanel.Shape;
 public class ToolBar extends JMenuBar {
 
 	private static final String buttonPath = "/de/snx/monstera/graphic/creator/";
-	private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
 
 	private CreatorWindow win;
 
@@ -31,16 +29,16 @@ public class ToolBar extends JMenuBar {
 	public ToolBar(CreatorWindow win) {
 		this.win = win;
 		setLayout(new FlowLayout(FlowLayout.LEFT));
-		add(b_draw = button("draw", true, a -> win.setMode(Mode.DRAW_TILES)));
+		add(b_draw = button("draw", "Draw Mode", a -> win.setMode(Mode.DRAW_TILES)));
 		b_draw.setSelected(true);
-		add(b_blocking = button("blocking", true, a -> win.setMode(Mode.SET_BLOCKING)));
-		add(b_entity = button("entity", true, a -> win.setMode(Mode.ENTITY)));
+		add(b_blocking = button("blocking", "Blocking Mode", a -> win.setMode(Mode.SET_BLOCKING)));
+		add(b_entity = button("entity", "Entity Mode", a -> win.setMode(Mode.ENTITY)));
 		add(new JSeparator());
 		layerImg = new ImageIcon[3];
 		layerImg[0] = new ImageIcon(getClass().getResource(buttonPath + "layer1.png"));
 		layerImg[1] = new ImageIcon(getClass().getResource(buttonPath + "layer2.png"));
 		layerImg[2] = new ImageIcon(getClass().getResource(buttonPath + "layer3.png"));
-		add(b_layer = button("layer1", false, a -> {
+		add(b_layer = button("layer1", false, "Switch Layer", a -> {
 			int layer = win.map.getSelectedLayer();
 			if (layer == 2)
 				layer = 0;
@@ -49,14 +47,14 @@ public class ToolBar extends JMenuBar {
 			win.setLayer(layer);
 		}));
 		add(new JSeparator());
-		add(b_single_tile = button("single_tile", true, a -> win.setDrawShape(Shape.SINGLE)));
+		add(b_single_tile = button("single_tile", "Draw Single Tile", a -> win.setDrawShape(Shape.SINGLE)));
 		b_single_tile.setSelected(true);
-		add(b_rect_tile = button("rectangle_tile", true, a -> win.setDrawShape(Shape.RECT)));
-		add(b_circle_tile = button("circle_tile", true, a -> win.setDrawShape(Shape.CIRCLE)));
-		add(b_fill_tile = button("fill_tile", true, a -> win.setDrawShape(Shape.FILL)));
+		add(b_rect_tile = button("rectangle_tile", "Draw in Rectangle Shape", a -> win.setDrawShape(Shape.RECT)));
+		add(b_circle_tile = button("circle_tile", "Draw in Circle Shape", a -> win.setDrawShape(Shape.CIRCLE)));
+		add(b_fill_tile = button("fill_tile", "Fill Tiles", a -> win.setDrawShape(Shape.FILL)));
 	}
 
-	private JButton button(String img, boolean sImg, ActionListener a) {
+	private JButton button(String img, boolean sImg, String tooltip, ActionListener a) {
 		JButton b = new JButton(new ImageIcon(getClass().getResource(buttonPath + img + ".png")));
 		b.setMinimumSize(new Dimension(24, 24));
 		b.setPreferredSize(new Dimension(24, 24));
@@ -64,7 +62,12 @@ public class ToolBar extends JMenuBar {
 		b.addActionListener(a);
 		if (sImg)
 			b.setSelectedIcon(new ImageIcon(getClass().getResource(buttonPath + img + "_s.png")));
+		b.setToolTipText(tooltip);
 		return b;
+	}
+
+	private JButton button(String img, String tooltip, ActionListener a) {
+		return button(img, true, tooltip, a);
 	}
 
 	public void setLayer(int layer) {

@@ -55,13 +55,13 @@ public class TilesetPanel extends JTabbedPane {
 	}
 
 	public BufferedImage getImage(int id) {
-		if (id == -1)
+		if (id < 0)
 			return null;
 		return tileset.get(keys.get(id));
 	}
 
 	public String getRegistryName(int id) {
-		if (id == -1)
+		if (id < 0)
 			return "null";
 		else
 			return keys.get(id);

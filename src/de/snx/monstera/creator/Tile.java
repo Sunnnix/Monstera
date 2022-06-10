@@ -5,6 +5,7 @@ public class Tile {
 	public final int X, Y;
 	public int l1 = -1, l2 = -1, l3 = -1;
 	public boolean isBlocking;
+	public int prev = -2;
 	
 	public Tile(int x, int y) {
 		this.X = x;
