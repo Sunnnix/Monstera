@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.snx.monstera.Game;
 import de.snx.monstera.battle.Ability;
@@ -15,7 +14,6 @@ import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.Entitys;
 import de.snx.monstera.map.Map;
-import de.snx.monstera.map.Tiles;
 import de.snx.monstera.map.event.Event;
 import de.snx.psf.PSFFileIO;
 
@@ -36,35 +34,43 @@ public class WorldState extends GameState {
 		// TODO =================
 		setBackgroundColor(Color.BLACK);
 		String fileName = "test";
-		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".map")) {
-			Ability.loadAll(file);
-			MonsterType.loadAll(file);
-			CombatGroups.loadAll(file);
-			file.room("maps", _s -> {
-				int size = file.readInt("size");
-				for (int i = 0; i < size; i++) {
-					file.room("m_" + i, __s -> {
-						Map map = new Map(file);
-						loadedMaps.add(map);
-					});
-					if (i == 0) {
-						currentMap = loadedMaps.get(0);
-						currentMap.addEntity(player);
-					}
-				}
-			});
+		int[] pMapID = new int[] { -1 };
+		int[] map_ids = new int[0];
+		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".mgame")) {
+			map_ids = file.readIntArray("maps");
 			file.room("player", _s -> {
-				int mapID = file.readInt("map_id");
-				if (mapID >= 0) {
-					player.setPos(file.readDouble("x"), file.readDouble("y"));
-					player.setDirection(file.readInt("direction"));
-					transferPlayer(mapID, (int) player.getX(), (int) player.getY());
-				}
+				pMapID[0] = file.readInt("map_id");
+				player.setPos(file.readDouble("x"), file.readDouble("y"));
+				player.setDirection(file.readInt("direction"));
 			});
-			Tiles.loadResources((List<String>) file.readArrayList("tile_res"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/abilities.dat")) {
+			Ability.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/monsters.dat")) {
+			MonsterType.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/groups.dat")) {
+			CombatGroups.loadAll(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (int map : map_ids) {
+			try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/map" + map + ".dat")) {
+				Map tmp = new Map(file);
+				loadedMaps.add(tmp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (pMapID[0] != -1)
+			transferPlayer(pMapID[0], (int) player.getX(), (int) player.getY());
 	}
 
 	@Override
@@ -161,8 +167,8 @@ public class WorldState extends GameState {
 	}
 
 	private void setCameraPos() {
-		int x = (int) (Game.TILESIZE / 2 + player.getX() * Game.TILESIZE - camera.getWidth() / 2);
-		int y = (int) (Game.TILESIZE / 2 + player.getY() * Game.TILESIZE - camera.getHeight() / 2);
+		int x = (int) (Game.S_TILESIZE / 2 + player.getX() * Game.S_TILESIZE - camera.getWidth() / 2);
+		int y = (int) (Game.S_TILESIZE / 2 + player.getY() * Game.S_TILESIZE - camera.getHeight() / 2);
 		camera.setLocation(x, y);
 	}
 
@@ -190,7 +196,8 @@ public class WorldState extends GameState {
 	}
 
 	public void transferPlayer(int mapID, int x, int y) {
-		currentMap.removeEntity(player);
+		if (currentMap != null)
+			currentMap.removeEntity(player);
 		changeMap(mapID);
 		player.setPos(x, y);
 		currentMap.addEntity(player);

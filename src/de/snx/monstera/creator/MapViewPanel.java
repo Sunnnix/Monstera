@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
@@ -135,8 +134,10 @@ public class MapViewPanel extends JPanel {
 				break;
 		try {
 			String name = JOptionPane.showInputDialog("Mapname:");
-			int width = Integer.parseInt(JOptionPane.showInputDialog(win, "Width:", selectedMap.width));
-			int height = Integer.parseInt(JOptionPane.showInputDialog(win, "Height:", selectedMap.height));
+			int width = Integer
+					.parseInt(JOptionPane.showInputDialog(win, "Width:", selectedMap != null ? selectedMap.width : 20));
+			int height = Integer.parseInt(
+					JOptionPane.showInputDialog(win, "Height:", selectedMap != null ? selectedMap.height : 20));
 			Map map = new Map(id);
 			map.name = name;
 			map.setSize(width, height);
@@ -254,7 +255,6 @@ public class MapViewPanel extends JPanel {
 		String name = JOptionPane.showInputDialog(win, "Project name:");
 		if (name == null || name.isEmpty())
 			return;
-		HashSet<String> usedKeys = new HashSet<>();
 		try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + ".mgame", "w")) {
 			file.write("maps", (ArrayList<?>) maps.stream().map(m -> m.ID).collect(Collectors.toList()));
 			file.room("player", _s -> {
@@ -285,7 +285,7 @@ public class MapViewPanel extends JPanel {
 		for (Map map : maps) {
 			try (PSFFileIO file = new PSFFileIO(ResourceStrings.CRT_BASIC_PATH + name + "/map" + map.ID + ".dat",
 					"w")) {
-				map.save(file, usedKeys, win.tileset);
+				map.save(file, win.tileset);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -309,23 +309,6 @@ public class MapViewPanel extends JPanel {
 			break;
 		}
 		win.repaint();
-	}
-
-	private void setTile(int x, int y, int id) {
-		switch (selectedLayer) {
-		case 0:
-			selectedMap.map[x][y].l1 = id;
-			break;
-		case 1:
-			selectedMap.map[x][y].l2 = id;
-			break;
-		case 2:
-			selectedMap.map[x][y].l3 = id;
-			break;
-		default:
-			break;
-		}
-		repaint();
 	}
 
 	private Entity newEntity(int id) {
@@ -371,41 +354,18 @@ public class MapViewPanel extends JPanel {
 		return e;
 	}
 
-	private void fillTile(int x, int y, int selected, int toFill) {
-		if (selected == toFill)
+	private void fillTile(int x, int y, int[] selected, int[] toFill) {
+		if (tileEquals(selected, toFill))
 			return;
 		if (x < 0 || y < 0 || x >= selectedMap.width || y >= selectedMap.height)
 			return;
-		boolean next = false;
-		switch (selectedLayer) {
-		case 0:
-			if (toFill == -2)
-				toFill = selectedMap.map[x][y].l1;
-			if (selectedMap.map[x][y].l1 == toFill) {
-				selectedMap.map[x][y].l1 = selected;
-				next = true;
-			}
-			break;
-		case 1:
-			if (toFill == -2)
-				toFill = selectedMap.map[x][y].l2;
-			if (selectedMap.map[x][y].l2 == toFill) {
-				selectedMap.map[x][y].l2 = selected;
-				next = true;
-			}
-			break;
-		case 2:
-			if (toFill == -2)
-				toFill = selectedMap.map[x][y].l2;
-			if (selectedMap.map[x][y].l2 == toFill) {
-				selectedMap.map[x][y].l2 = selected;
-				next = true;
-			}
-			break;
-		default:
-			break;
+		int[] tile = getTile(x, y);
+		if (toFill[1] == -2) {
+			toFill[0] = tile[0];
+			toFill[1] = tile[1];
 		}
-		if (next) {
+		if (tileEquals(tile, toFill)) {
+			setTile(x, y, selected);
 			fillTile(x + 1, y, selected, toFill);
 			fillTile(x - 1, y, selected, toFill);
 			fillTile(x, y + 1, selected, toFill);
@@ -413,7 +373,7 @@ public class MapViewPanel extends JPanel {
 		}
 	}
 
-	private void setTilePrev(int x, int y, int x2, int y2, int id) {
+	private void setTilePrev(int x, int y, int x2, int y2, int[] id) {
 		if (x > x2) {
 			int tmp = x;
 			x = x2;
@@ -425,69 +385,90 @@ public class MapViewPanel extends JPanel {
 			y2 = tmp;
 		}
 		if (shape == Shape.RECT) {
-			for (int i = x < 1 ? 0 : x - 1; i <= x2 + 1; i++)
-				for (int j = y < 1 ? 0 : y - 1; j <= y2 + 1; j++)
+			for (int i = 0; i < selectedMap.width; i++)
+				for (int j = 0; j < selectedMap.height; j++) {
+					int[] prev = selectedMap.map[i][j].prev;
 					if (i < x || j < y || i > x2 || j > y2)
-						selectedMap.map[i][j].prev = -2;
-					else
-						selectedMap.map[i][j].prev = id;
+						prev[1] = -2;
+					else {
+						prev[0] = id[0];
+						prev[1] = id[1];
+					}
+				}
 		} else {
 
 		}
-		repaint();
 	}
 
 	private void copyTileGraphic(int x, int y) {
-		switch (selectedLayer) {
-		case 0:
-			if (selectedMap.map[x][y].l1 != -1) {
-				win.tileset.selected = selectedMap.map[x][y].l1;
-				win.tileset.repaint();
-			}
-			break;
-		case 1:
-			if (selectedMap.map[x][y].l2 != -1) {
-				win.tileset.selected = selectedMap.map[x][y].l2;
-				win.tileset.repaint();
-			}
-			break;
-		case 2:
-			if (selectedMap.map[x][y].l3 != -1) {
-				win.tileset.selected = selectedMap.map[x][y].l3;
-				win.tileset.repaint();
-			}
-			break;
-		default:
-			break;
+		if (selectedMap.map[x][y].l1[1] != -1) {
+			win.tileset.selected = getTile(x, y);
+			win.tileset.repaint();
 		}
 	}
 
 	private void setFromPrev() {
 		for (int x = 0; x < selectedMap.width; x++)
-			for (int y = 0; y < selectedMap.height; y++)
-				if (selectedMap.map[x][y].prev != -2) {
-					int id = selectedMap.map[x][y].prev;
-					selectedMap.map[x][y].prev = -2;
-					switch (selectedLayer) {
-					case 0:
-						selectedMap.map[x][y].l1 = id;
-						break;
-					case 1:
-						selectedMap.map[x][y].l2 = id;
-						break;
-					case 2:
-						selectedMap.map[x][y].l3 = id;
-						break;
-					default:
-						break;
-					}
+			for (int y = 0; y < selectedMap.height; y++) {
+				Tile tile = selectedMap.map[x][y];
+				if (tile.prev[1] != -2) {
+					int[] id = tile.prev.clone();
+					tile.prev[1] = -2;
+					setTile(x, y, id);
 				}
+			}
 		repaint();
 	}
 
 	private void removeEntity(Entity e) {
 		selectedMap.entitys.remove(e);
 		repaint();
+	}
+
+	private int[] getTile(int x, int y) {
+		int[] tmp = new int[] { -1, -1 };
+		Tile tile = selectedMap.map[x][y];
+		switch (selectedLayer) {
+		case 0:
+			tmp[0] = tile.l1[0];
+			tmp[1] = tile.l1[1];
+			break;
+		case 1:
+			tmp[0] = tile.l2[0];
+			tmp[1] = tile.l2[1];
+			break;
+		case 2:
+			tmp[0] = tile.l3[0];
+			tmp[1] = tile.l3[1];
+			break;
+		default:
+			break;
+		}
+		return tmp;
+	}
+
+	private void setTile(int x, int y, int[] id) {
+		Tile tile = selectedMap.map[x][y];
+		switch (selectedLayer) {
+		case 0:
+			tile.l1[0] = id[0];
+			tile.l1[1] = id[1];
+			break;
+		case 1:
+			tile.l2[0] = id[0];
+			tile.l2[1] = id[1];
+			break;
+		case 2:
+			tile.l3[0] = id[0];
+			tile.l3[1] = id[1];
+			break;
+		default:
+			break;
+		}
+	}
+
+	private boolean tileEquals(int[] t1, int[] t2) {
+		return t1[0] == t2[0] && t1[1] == t2[1];
 	}
 
 	private class MListener extends MouseAdapter {
@@ -497,6 +478,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (selectedMap == null)
+				return;
 			int x, y;
 			x = e.getX() / TilesetPanel.TILESIZE;
 			y = e.getY() / TilesetPanel.TILESIZE;
@@ -516,12 +499,13 @@ public class MapViewPanel extends JPanel {
 						setTile(x, y, win.tileset.selected);
 						break;
 					case FILL:
-						fillTile(x, y, win.tileset.selected, -2);
+						fillTile(x, y, win.tileset.selected, new int[] { -1, -2 });
 						break;
 					default:
 						setTilePrev(x, y, x, y, win.tileset.selected);
 						break;
 					}
+					repaint();
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = true;
@@ -558,13 +542,13 @@ public class MapViewPanel extends JPanel {
 				case DRAW_TILES:
 					switch (shape) {
 					case SINGLE:
-						setTile(x, y, -1);
+						setTile(x, y, new int[] { -1, -1 });
 						break;
 					case FILL:
-						fillTile(x, y, -1, -2);
+						fillTile(x, y, new int[] { -1, -1 }, new int[] { -1, -2 });
 						break;
 					default:
-						setTilePrev(x, y, x, y, -1);
+						setTilePrev(x, y, x, y, new int[] { -1, -1 });
 						break;
 					}
 					repaint();
@@ -593,6 +577,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if (selectedMap == null)
+				return;
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (pressed == 1)
 					pressed = 0;
@@ -606,6 +592,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if (selectedMap == null)
+				return;
 			int x, y;
 			x = e.getX() / TilesetPanel.TILESIZE;
 			y = e.getY() / TilesetPanel.TILESIZE;
@@ -628,6 +616,7 @@ public class MapViewPanel extends JPanel {
 						setTilePrev(pressX, pressY, x, y, win.tileset.selected);
 						break;
 					}
+					repaint();
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = true;
@@ -647,14 +636,15 @@ public class MapViewPanel extends JPanel {
 				case DRAW_TILES:
 					switch (shape) {
 					case SINGLE:
-						setTile(x, y, -1);
+						setTile(x, y, new int[] { -1, -1 });
 						break;
 					case FILL:
 						break;
 					default:
-						setTilePrev(pressX, pressY, x, y, -1);
+						setTilePrev(pressX, pressY, x, y, new int[] { -1, -1 });
 						break;
 					}
+					repaint();
 					break;
 				case SET_BLOCKING:
 					selectedMap.map[x][y].isBlocking = false;

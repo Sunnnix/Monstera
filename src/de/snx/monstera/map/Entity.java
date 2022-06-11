@@ -115,8 +115,8 @@ public class Entity {
 		if (invisible)
 			return;
 		BufferedImage img = this.img.getImage(direction, anim);
-		int x = (int) (this.x * Game.TILESIZE) + Game.TILESIZE / 2 - img.getWidth() / 2 - offsetX;
-		int y = (int) (this.y * Game.TILESIZE) + Game.TILESIZE - img.getHeight() - offsetY;
+		int x = (int) (this.x * Game.S_TILESIZE) + Game.S_TILESIZE / 2 - img.getWidth() / 2 - offsetX;
+		int y = (int) (this.y * Game.S_TILESIZE) + Game.S_TILESIZE - img.getHeight() - offsetY;
 		g.drawImage(img, x, y, null);
 	}
 

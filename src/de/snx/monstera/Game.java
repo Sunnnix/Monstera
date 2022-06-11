@@ -5,8 +5,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import de.snx.monstera.battle.MonsterType;
-import de.snx.monstera.global_data.CombatGroups;
+import de.snx.monstera.map.Tiles;
 import de.snx.monstera.state.BattleState;
 import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.IntroState;
@@ -18,7 +17,8 @@ public class Game {
 	public static final String NAME = "Pokemon";
 	public static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
 	public static final double SCALE = 2;
-	public static final int TILESIZE = (int) (24 * SCALE);
+	public static final int TILESIZE = 24;
+	public static final int S_TILESIZE = (int) (TILESIZE * SCALE);
 	public static final int TICKS = 60;
 
 	private Window window;
@@ -126,6 +126,7 @@ public class Game {
 
 	private void loadRes() {
 		registerEvents();
+		Tiles.loadRes();
 	}
 
 	private void registerEvents() {

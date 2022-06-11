@@ -7,128 +7,110 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 @SuppressWarnings("serial")
 public class TilesetPanel extends JTabbedPane {
 
 	public static final int TILESIZE = 24;
-	public static final int COL = 12;
 
 	private CreatorWindow win;
 
-	private HashMap<String, BufferedImage> tileset = new HashMap<>();
-	private ArrayList<String> keys = new ArrayList<>();
-
-	public int selected = 0;
+	public int[] selected = new int[] { -1, -1 };
 
 	private JTabbedPane outdoor, house, cave;
-	private Tileset o_floor, o_object, h_floor, h_object, c_floor, c_object;
+	private Tileset[] tileset = new Tileset[6];
 
 	public TilesetPanel(CreatorWindow win) {
 		this.win = win;
 		outdoor = new JTabbedPane();
-		outdoor.add(o_floor = new Tileset(), "Floor");
-		outdoor.add(o_object = new Tileset(), "Object");
+		outdoor.add(paneBuilder(tileset[0] = new Tileset(0)), "Floor");
+		tileset[0].loadTiles("outdoor_floor");
+		outdoor.add(paneBuilder(tileset[1] = new Tileset(1)), "Object");
+		tileset[1].loadTiles("outdoor_object");
 		house = new JTabbedPane();
-		house.add(h_floor = new Tileset(), "Floor");
-		house.add(h_object = new Tileset(), "Object");
+		house.add(paneBuilder(tileset[2] = new Tileset(2)), "Floor");
+		tileset[2].loadTiles("house_floor");
+		house.add(paneBuilder(tileset[3] = new Tileset(3)), "Object");
+		tileset[3].loadTiles("house_object");
 		cave = new JTabbedPane();
-		cave.add(c_floor = new Tileset(), "Floor");
-		cave.add(c_object = new Tileset(), "Object");
+		cave.add(paneBuilder(tileset[4] = new Tileset(4)), "Floor");
+		tileset[4].loadTiles("cave_floor");
+		cave.add(paneBuilder(tileset[5] = new Tileset(5)), "Object");
+		tileset[5].loadTiles("cave_object");
 		add(outdoor, "Outdoor");
 		add(house, "House");
 		add(cave, "Cave");
-		int count = o_floor.loadTiles(0, "outdoor/floor");
-		count = o_object.loadTiles(count, "outdoor/object");
-		count = h_floor.loadTiles(count, "house/floor");
-		count = h_object.loadTiles(count, "house/object");
-		count = c_floor.loadTiles(count, "cave/floor");
-		count = c_object.loadTiles(count, "cave/object");
 		win.repaint();
 	}
 
-	public BufferedImage getImage(int id) {
-		if (id < 0)
+	private JScrollPane paneBuilder(Tileset set) {
+		JScrollPane pane = new JScrollPane(set);
+		pane.setPreferredSize(new Dimension(307, 730));
+		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		return pane;
+	}
+
+	public BufferedImage getImage(int[] pos) {
+		if (pos[0] == -1)
 			return null;
-		return tileset.get(keys.get(id));
-	}
-
-	public String getRegistryName(int id) {
-		if (id < 0)
-			return "null";
-		else
-			return keys.get(id);
-	}
-
-	public int getIDFromKey(String key) {
-		for (int i = 0; i < keys.size(); i++)
-			if (keys.get(i).equals(key))
-				return i;
-		return -1;
+		return tileset[pos[0]].get(pos[1]);
 	}
 
 	private class Tileset extends JPanel {
 
-		private int start, end;
+		private final int id;
+		private int width;
+		BufferedImage[] tiles;
 
-		public Tileset() {
-			setPreferredSize(new Dimension(298, 730));
+		public Tileset(int id) {
+			this.id = id;
+			setPreferredSize(new Dimension(289, 730));
 			MListener l = new MListener();
 			addMouseListener(l);
 			addMouseMotionListener(l);
 		}
 
-		public int loadTiles(int start, String parentPath) {
-			this.start = start;
-			int counter = start;
+		public void loadTiles(String tileset) {
 			try {
-				File[] files = new File("res/de/snx/monstera/graphic/tile/" + parentPath).listFiles(new FileFilter() {
-					@Override
-					public boolean accept(File f) {
-						return f.getName().endsWith(".png");
-					}
-				});
-				for (File file : files) {
-					String path = parentPath + "/" + file.getName().substring(0, file.getName().indexOf(".png"));
-					BufferedImage img = ImageIO.read(file);
-					if (tileset.containsKey(path)) {
-						for (int index = 0; index < keys.size(); index++)
-							if (keys.get(index).equals(path))
-								keys.set(index, path);
-					} else
-						keys.add(path);
-					tileset.put(path, img);
-					counter++;
-				}
+				BufferedImage root = ImageIO
+						.read(new File("res/de/snx/monstera/graphic/tileset/tileset_" + tileset + ".png"));
+				width = root.getWidth() / TILESIZE;
+				int height = root.getHeight() / TILESIZE;
+				tiles = new BufferedImage[width * height];
+				for (int i = 0; i < tiles.length; i++)
+					tiles[i] = root.getSubimage(i % width * TILESIZE, i / width * TILESIZE, TILESIZE, TILESIZE);
+				setPreferredSize(new Dimension(width * TILESIZE, height * TILESIZE));
+				revalidate();
 			} catch (Exception e) {
 				e.printStackTrace();
-				return 0;
 			}
-			end = counter;
-			return counter;
 		}
 
 		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
-			if (start < keys.size())
-				for (int i = start; i < end; i++) {
-					BufferedImage img = tileset.get(keys.get(i));
-					g.drawImage(img, 5 + (i - start) % COL * TILESIZE, 5 + (i - start) / COL * TILESIZE, TILESIZE,
-							TILESIZE, win);
-				}
-			if (selected >= start && selected < end) {
-				g.setColor(Color.GREEN);
-				g.drawRect(5 + TILESIZE * ((selected - start) % COL), 5 + TILESIZE * ((selected - start) / COL),
-						TILESIZE, TILESIZE);
+			if (tiles == null)
+				return;
+			for (int i = 0; i < tiles.length; i++) {
+				g.drawImage(tiles[i % width + i / width * width], i % width * TILESIZE, i / width * TILESIZE, TILESIZE,
+						TILESIZE, null);
 			}
+			if (selected[0] == id) {
+				g.setColor(Color.GREEN);
+				g.drawRect(selected[1] % width * TILESIZE, selected[1] / width * TILESIZE, TILESIZE, TILESIZE);
+			}
+		}
+
+		public BufferedImage get(int pos) {
+			if (pos < 0 || pos >= tiles.length)
+				return null;
+			return tiles[pos];
 		}
 
 		private class MListener extends MouseAdapter {
@@ -137,16 +119,13 @@ public class TilesetPanel extends JTabbedPane {
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					int x, y, selected;
-					x = e.getX();
-					y = e.getY();
-					if (x < 5 || x > 5 + TILESIZE * COL || y < 5)
+					x = e.getX() / TILESIZE;
+					y = e.getY() / TILESIZE;
+					selected = x + y * width;
+					if (selected < 0 || selected >= tiles.length)
 						return;
-					x = (x - 5) / TILESIZE;
-					y = (y - 5) / TILESIZE;
-					selected = start + (x + y * COL);
-					if (selected < start || selected >= end || selected >= keys.size())
-						return;
-					TilesetPanel.this.selected = selected;
+					TilesetPanel.this.selected[0] = id;
+					TilesetPanel.this.selected[1] = selected;
 					win.repaint();
 				}
 			}

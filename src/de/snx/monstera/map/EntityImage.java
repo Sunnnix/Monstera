@@ -16,7 +16,7 @@ public class EntityImage {
 	public EntityImage(String res) {
 		this.registryName = res;
 		if (res == null) {
-			BufferedImage tmp = new BufferedImage(Game.TILESIZE, (int) (Game.TILESIZE * 1.2),
+			BufferedImage tmp = new BufferedImage(Game.S_TILESIZE, (int) (Game.S_TILESIZE * 1.2),
 					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = tmp.createGraphics();
 			g.setColor(Color.BLACK);

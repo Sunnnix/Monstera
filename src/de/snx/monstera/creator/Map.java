@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import de.snx.monstera.creator.MapViewPanel.Mode;
 import de.snx.monstera.map.Entity;
@@ -49,10 +48,14 @@ public class Map {
 				final Tile tile = new Tile(x, y);
 				map[x][y] = tile;
 				file.room("tile_" + x + "_" + y, _s -> {
-					tile.l1 = tileset.getIDFromKey(file.readString("l1"));
-					tile.l2 = tileset.getIDFromKey(file.readString("l2"));
-					tile.l3 = tileset.getIDFromKey(file.readString("l3"));
-					tile.isBlocking = file.readBoolean("blocking");
+					try {
+						tile.l1 = file.readIntArray("l1");
+						tile.l2 = file.readIntArray("l2");
+						tile.l3 = file.readIntArray("l3");
+						tile.isBlocking = file.readBoolean("blocking");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				});
 			}
 		file.room("entitys", s -> {
@@ -70,7 +73,7 @@ public class Map {
 		});
 	}
 
-	public void save(PSFFileIO file, HashSet<String> usedKeys, TilesetPanel tileset) {
+	public void save(PSFFileIO file, TilesetPanel tileset) {
 		file.write("id", ID);
 		file.write("name", name);
 		try {
@@ -83,19 +86,14 @@ public class Map {
 			for (int y = 0; y < height; y++) {
 				final Tile tile = map[x][y];
 				file.room("tile_" + x + "_" + y, s -> {
-					String key = tileset.getRegistryName(tile.l1);
-					if (key != "null")
-						usedKeys.add(key);
-					file.write("l1", key);
-					key = tileset.getRegistryName(tile.l2);
-					if (key != "null")
-						usedKeys.add(key);
-					file.write("l2", key);
-					key = tileset.getRegistryName(tile.l3);
-					if (key != "null")
-						usedKeys.add(key);
-					file.write("l3", key);
-					file.write("blocking", tile.isBlocking);
+					try {
+						file.write("l1", tile.l1);
+						file.write("l2", tile.l2);
+						file.write("l3", tile.l3);
+						file.write("blocking", tile.isBlocking);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				});
 			}
 		file.room("entitys", s -> {
@@ -149,7 +147,7 @@ public class Map {
 				g.drawImage(i2, x * ts, y * ts, ts, ts, null);
 				g.drawImage(i3, x * ts, y * ts, ts, ts, null);
 				g.setColor(win.map.getBackground());
-				if (tile.prev == -1)
+				if (tile.prev[1] == -1)
 					g.fillRect(x * ts, y * ts, ts, ts);
 				else {
 					prev = win.tileset.getImage(tile.prev);

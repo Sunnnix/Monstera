@@ -19,21 +19,22 @@ public class Map {
 
 	public Map(PSFFileIO file) {
 		ID = file.readInt("id");
+		int width = 0, height = 0;
 		try {
 			int[] size = file.readIntArray("size");
-			WIDTH = size[0];
-			HEIGHT = size[1];
-			map = new MapData[WIDTH][HEIGHT];
+			width = size[0];
+			height = size[1];
+			map = new MapData[width][height];
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
+		WIDTH = width;
+		HEIGHT = height;
 		for (int x = 0; x < WIDTH; x++)
 			for (int y = 0; y < HEIGHT; y++) {
 				final MapData tile = new MapData(x, y);
 				map[x][y] = tile;
-				file.room("tile_" + x + "_" + y, _s -> {
-					tile.load(file);
-				});
+				file.room("tile_" + x + "_" + y, _s -> tile.load(file));
 			}
 		file.room("entitys", s -> {
 			int size = file.readInt("size");
@@ -73,11 +74,11 @@ public class Map {
 		int cX = state.getCameraX(), cY = state.getCameraY();
 		for (int x = 0; x < WIDTH; x++)
 			for (int y = 0; y < HEIGHT; y++)
-				map[x][y].renderL1(g, x * Game.TILESIZE, y * Game.TILESIZE, cX, cY);
+				map[x][y].renderL1(g, x * Game.S_TILESIZE, y * Game.S_TILESIZE, cX, cY);
 		entitys.forEach(e -> e.render(g, cX, cY));
 		for (int x = 0; x < WIDTH; x++)
 			for (int y = 0; y < HEIGHT; y++)
-				map[x][y].renderL2(g, x * Game.TILESIZE, y * Game.TILESIZE, cX, cY);
+				map[x][y].renderL2(g, x * Game.S_TILESIZE, y * Game.S_TILESIZE, cX, cY);
 	}
 
 	public MapData getTile(int x, int y) {
