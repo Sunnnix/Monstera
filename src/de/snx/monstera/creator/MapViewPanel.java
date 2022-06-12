@@ -359,6 +359,8 @@ public class MapViewPanel extends JPanel {
 			return;
 		if (x < 0 || y < 0 || x >= selectedMap.width || y >= selectedMap.height)
 			return;
+		selected[2] = 1;
+		selected[3] = 1;
 		int[] tile = getTile(x, y);
 		if (toFill[1] == -2) {
 			toFill[0] = tile[0];
@@ -414,7 +416,7 @@ public class MapViewPanel extends JPanel {
 				if (tile.prev[1] != -2) {
 					int[] id = tile.prev.clone();
 					tile.prev[1] = -2;
-					setTile(x, y, id);
+					setTile(x, y, new int[] { id[0], id[1], 1, 1 });
 				}
 			}
 		repaint();
@@ -426,7 +428,7 @@ public class MapViewPanel extends JPanel {
 	}
 
 	private int[] getTile(int x, int y) {
-		int[] tmp = new int[] { -1, -1 };
+		int[] tmp = new int[] { -1, -1, 1, 1 };
 		Tile tile = selectedMap.map[x][y];
 		switch (selectedLayer) {
 		case 0:
@@ -448,23 +450,26 @@ public class MapViewPanel extends JPanel {
 	}
 
 	private void setTile(int x, int y, int[] id) {
-		Tile tile = selectedMap.map[x][y];
-		switch (selectedLayer) {
-		case 0:
-			tile.l1[0] = id[0];
-			tile.l1[1] = id[1];
-			break;
-		case 1:
-			tile.l2[0] = id[0];
-			tile.l2[1] = id[1];
-			break;
-		case 2:
-			tile.l3[0] = id[0];
-			tile.l3[1] = id[1];
-			break;
-		default:
-			break;
-		}
+		for (int tX = 0; tX < id[2] && x + tX < selectedMap.width; tX++)
+			for (int tY = 0; tY < id[3] && y + tY < selectedMap.height; tY++) {
+				Tile tile = selectedMap.map[x + tX][y + tY];
+				switch (selectedLayer) {
+				case 0:
+					tile.l1[0] = id[0];
+					tile.l1[1] = id[1] + tX + tY * win.tileset.getSWidth();
+					break;
+				case 1:
+					tile.l2[0] = id[0];
+					tile.l2[1] = id[1] + tX + tY * win.tileset.getSWidth();
+					break;
+				case 2:
+					tile.l3[0] = id[0];
+					tile.l3[1] = id[1] + tX + tY * win.tileset.getSWidth();
+					break;
+				default:
+					break;
+				}
+			}
 	}
 
 	private boolean tileEquals(int[] t1, int[] t2) {
@@ -499,7 +504,7 @@ public class MapViewPanel extends JPanel {
 						setTile(x, y, win.tileset.selected);
 						break;
 					case FILL:
-						fillTile(x, y, win.tileset.selected, new int[] { -1, -2 });
+						fillTile(x, y, win.tileset.selected, new int[] { -1, -2, 1, 1 });
 						break;
 					default:
 						setTilePrev(x, y, x, y, win.tileset.selected);
@@ -542,13 +547,13 @@ public class MapViewPanel extends JPanel {
 				case DRAW_TILES:
 					switch (shape) {
 					case SINGLE:
-						setTile(x, y, new int[] { -1, -1 });
+						setTile(x, y, new int[] { -1, -1, 1, 1 });
 						break;
 					case FILL:
-						fillTile(x, y, new int[] { -1, -1 }, new int[] { -1, -2 });
+						fillTile(x, y, new int[] { -1, -1, 1, 1 }, new int[] { -1, -2, 1, 1 });
 						break;
 					default:
-						setTilePrev(x, y, x, y, new int[] { -1, -1 });
+						setTilePrev(x, y, x, y, new int[] { -1, -1, 1, 1 });
 						break;
 					}
 					repaint();
@@ -636,12 +641,12 @@ public class MapViewPanel extends JPanel {
 				case DRAW_TILES:
 					switch (shape) {
 					case SINGLE:
-						setTile(x, y, new int[] { -1, -1 });
+						setTile(x, y, new int[] { -1, -1, 1, 1 });
 						break;
 					case FILL:
 						break;
 					default:
-						setTilePrev(pressX, pressY, x, y, new int[] { -1, -1 });
+						setTilePrev(pressX, pressY, x, y, new int[] { -1, -1, 1, 1 });
 						break;
 					}
 					repaint();

@@ -20,7 +20,7 @@ public class TilesetPanel extends JTabbedPane {
 
 	private CreatorWindow win;
 
-	public int[] selected = new int[] { -1, -1 };
+	public int[] selected = new int[] { -1, -1, 1, 1 };
 
 	private JTabbedPane outdoor, house, cave;
 	private Tileset[] tileset = new Tileset[6];
@@ -46,6 +46,12 @@ public class TilesetPanel extends JTabbedPane {
 		add(house, "House");
 		add(cave, "Cave");
 		win.repaint();
+	}
+
+	public int getSWidth() {
+		if (selected[0] == -1)
+			return 0;
+		return tileset[selected[0]].width;
 	}
 
 	private JScrollPane paneBuilder(Tileset set) {
@@ -103,7 +109,8 @@ public class TilesetPanel extends JTabbedPane {
 			}
 			if (selected[0] == id) {
 				g.setColor(Color.GREEN);
-				g.drawRect(selected[1] % width * TILESIZE, selected[1] / width * TILESIZE, TILESIZE, TILESIZE);
+				g.drawRect(selected[1] % width * TILESIZE, selected[1] / width * TILESIZE, TILESIZE * selected[2],
+						TILESIZE * selected[3]);
 			}
 		}
 
@@ -115,19 +122,57 @@ public class TilesetPanel extends JTabbedPane {
 
 		private class MListener extends MouseAdapter {
 
+			private boolean pressed;
+			private int startX, startY;
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
+					pressed = true;
+					int x, y, selected;
+					x = e.getX() / TILESIZE;
+					y = e.getY() / TILESIZE;
+					startX = x;
+					startY = y;
+					selected = x + y * width;
+					if (selected < 0 || selected >= tiles.length)
+						return;
+					TilesetPanel.this.selected = new int[] { id, selected, 1, 1 };
+					win.repaint();
+				}
+			}
+
+			public void mouseDragged(MouseEvent e) {
+				if (pressed) {
 					int x, y, selected;
 					x = e.getX() / TILESIZE;
 					y = e.getY() / TILESIZE;
 					selected = x + y * width;
 					if (selected < 0 || selected >= tiles.length)
 						return;
-					TilesetPanel.this.selected[0] = id;
-					TilesetPanel.this.selected[1] = selected;
-					win.repaint();
+					int x2, y2;
+					if (x > startX) {
+						x2 = x;
+						x = startX;
+					} else
+						x2 = startX;
+					if (y > startY) {
+						y2 = y;
+						y = startY;
+					} else
+						y2 = startY;
+					selected = x + y * width;
+					int width = x2 - x + 1;
+					int height = y2 - y + 1;
+					TilesetPanel.this.selected = new int[] { id, selected, width, height };
+					repaint();
 				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1)
+					pressed = false;
 			}
 		}
 	}
