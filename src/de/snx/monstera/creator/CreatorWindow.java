@@ -10,6 +10,9 @@ import javax.swing.JScrollPane;
 import de.snx.monstera.Main;
 import de.snx.monstera.creator.MapViewPanel.Mode;
 import de.snx.monstera.creator.MapViewPanel.Shape;
+import de.snx.monstera.global_data.ResourceStrings;
+import de.snx.monstera.global_data.TilesetProperties;
+import de.snx.psf.PSFFileIO;
 
 @SuppressWarnings("serial")
 public class CreatorWindow extends JFrame {
@@ -57,6 +60,11 @@ public class CreatorWindow extends JFrame {
 
 	private void loadRes() {
 		Main.registerAll();
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.TILESET_PATH + "properties.prop", "r")) {
+			TilesetProperties.load(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setLayer(int layer) {

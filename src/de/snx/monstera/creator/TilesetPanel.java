@@ -68,11 +68,15 @@ public class TilesetPanel extends JTabbedPane {
 		return tileset[pos[0]].get(pos[1]);
 	}
 
+	public BufferedImage getTileset(int id) {
+		return tileset[id].root;
+	}
+
 	private class Tileset extends JPanel {
 
 		private final int id;
 		private int width;
-		BufferedImage[] tiles;
+		BufferedImage root, tiles[];
 
 		public Tileset(int id) {
 			this.id = id;
@@ -84,8 +88,7 @@ public class TilesetPanel extends JTabbedPane {
 
 		public void loadTiles(String tileset) {
 			try {
-				BufferedImage root = ImageIO
-						.read(new File("res/de/snx/monstera/graphic/tileset/tileset_" + tileset + ".png"));
+				root = ImageIO.read(new File("res/de/snx/monstera/graphic/tileset/tileset_" + tileset + ".png"));
 				width = root.getWidth() / TILESIZE;
 				int height = root.getHeight() / TILESIZE;
 				tiles = new BufferedImage[width * height];

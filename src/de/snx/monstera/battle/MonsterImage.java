@@ -20,11 +20,11 @@ public class MonsterImage {
 	private void loadImage(String path) {
 		try {
 			if (path == null) {
-				img[0] = ImageIO.read(getClass().getResource(MONSTER_IMG + "missing" + IMG_TYPE));
+				img[0] = ImageIO.read(getClass().getResource(S_MONSTER_IMG + "missing" + IMG_TYPE));
 				img[1] = img[0];
 			} else {
-				img[0] = ImageIO.read(getClass().getResource(MONSTER_IMG + path + IMG_TYPE));
-				img[1] = ImageIO.read(getClass().getResource(MONSTER_IMG + path + IMG_TYPE));
+				img[0] = ImageIO.read(getClass().getResource(S_MONSTER_IMG + path + IMG_TYPE));
+				img[1] = ImageIO.read(getClass().getResource(S_MONSTER_IMG + path + IMG_TYPE));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

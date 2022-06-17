@@ -49,6 +49,7 @@ public class MenuBar extends JMenuBar {
 		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Set Mapsize"), null, e -> win.map.openSizeDialog());
 		menu.add(new JSeparator());
+		bindMenu(menu, new JMenuItem("Edit Tileset Properties"), KeyStroke.getKeyStroke(VK_T, ALT_MASK), e -> new TilesetEditorWin(win));
 		bindMenu(menu, new JMenuItem("Edit Abilities"), KeyStroke.getKeyStroke(VK_A, ALT_MASK),
 				e -> new EditAbilities(win));
 		bindMenu(menu, new JMenuItem("Edit Monsters"), KeyStroke.getKeyStroke(VK_M, ALT_MASK),

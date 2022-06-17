@@ -11,6 +11,8 @@ import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.global_data.Keys;
+import de.snx.monstera.global_data.ResourceStrings;
+import de.snx.monstera.global_data.TilesetProperties;
 import de.snx.monstera.map.Entity;
 import de.snx.monstera.map.Entitys;
 import de.snx.monstera.map.Map;
@@ -36,6 +38,11 @@ public class WorldState extends GameState {
 		String fileName = "test";
 		int[] pMapID = new int[] { -1 };
 		int[] map_ids = new int[0];
+		try (PSFFileIO file = new PSFFileIO(ResourceStrings.TILESET_PATH + "properties.prop", "r")) {
+			TilesetProperties.load(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".mgame")) {
 			map_ids = file.readIntArray("maps");
 			file.room("player", _s -> {

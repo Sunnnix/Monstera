@@ -26,6 +26,7 @@ import de.snx.monstera.battle.Ability;
 import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.global_data.CombatGroups;
 import de.snx.monstera.global_data.ResourceStrings;
+import de.snx.monstera.global_data.TilesetProperties;
 import de.snx.monstera.map.Entity;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -248,6 +249,11 @@ public class MapViewPanel extends JPanel {
 	}
 
 	public void saveProject() {
+		try (PSFFileIO file = new PSFFileIO("Creator/output/properties.prop", "w")) {
+			TilesetProperties.save(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if (pMapID == -1 || !maps.stream().anyMatch(m -> m.ID == pMapID)) {
 			JOptionPane.showMessageDialog(win, "The player is not set!");
 			return;

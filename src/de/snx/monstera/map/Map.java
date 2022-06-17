@@ -71,6 +71,7 @@ public class Map {
 	}
 
 	public void render(WorldState state, GameStateManager gsm, Graphics2D g) {
+		Tiles.update();
 		int cX = state.getCameraX(), cY = state.getCameraY();
 		for (int x = 0; x < WIDTH; x++)
 			for (int y = 0; y < HEIGHT; y++)

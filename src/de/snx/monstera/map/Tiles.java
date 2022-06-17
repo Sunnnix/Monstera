@@ -10,6 +10,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import de.snx.monstera.Game;
+import de.snx.monstera.global_data.TilesetProperties;
+import de.snx.monstera.global_data.TilesetProperties.Propertie;
 
 public class Tiles {
 
@@ -18,6 +20,8 @@ public class Tiles {
 	private static HashMap<String, BufferedImage> graphics = new HashMap<>();
 
 	public static String WHITE = "floor/wood_floor_0";
+
+	private static int animTimer;
 
 	public static void loadRes() {
 		tiles = new BufferedImage[6][];
@@ -69,11 +73,21 @@ public class Tiles {
 	public static BufferedImage get(int[] pos) {
 		if (pos[0] == -1 || pos[1] == -1)
 			return null;
-		try {
-			return tiles[pos[0]][pos[1]];
-		} catch (NullPointerException | IndexOutOfBoundsException e) {
-			throw new RuntimeException("Couldn't get a tile graphics! Maybe no tileset or the wrong is loaded.", e);
-		}
+		Propertie prop = TilesetProperties.getPropertie(pos);
+		if (prop.animate) {
+			int maxTimer = prop.animTempo * prop.animImg.length;
+			int value = animTimer % maxTimer;
+			return prop.animImg[value / prop.animTempo];
+		} else
+			try {
+				return tiles[pos[0]][pos[1]];
+			} catch (NullPointerException | IndexOutOfBoundsException e) {
+				throw new RuntimeException("Couldn't get a tile graphics! Maybe no tileset or the wrong is loaded.", e);
+			}
+	}
+
+	public static void update() {
+		animTimer++;
 	}
 
 }

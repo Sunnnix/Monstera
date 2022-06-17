@@ -2,7 +2,11 @@ package de.snx.monstera;
 
 import de.snx.monstera.creator.CreatorWindow;
 import de.snx.monstera.global_data.Registry;
-import de.snx.monstera.map.event.*;
+import de.snx.monstera.map.event.BattleEvent;
+import de.snx.monstera.map.event.MoveEvent;
+import de.snx.monstera.map.event.TeleportEvent;
+import de.snx.monstera.map.event.TextEvent;
+import de.snx.monstera.map.event.TransferPlayerEvent;
 
 public class Main {
 
@@ -18,6 +22,7 @@ public class Main {
 		Registry.registerEvent(TeleportEvent.class);
 		Registry.registerEvent(TransferPlayerEvent.class);
 		Registry.registerEvent(BattleEvent.class);
+		Registry.registerEvent(MoveEvent.class);
 	}
 
 }
