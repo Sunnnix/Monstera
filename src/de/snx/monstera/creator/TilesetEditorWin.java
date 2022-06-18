@@ -22,6 +22,7 @@ import de.snx.monstera.global_data.TilesetProperties.Propertie;
 public class TilesetEditorWin extends JDialog {
 
 	private CreatorWindow win;
+	private JTextField tooltip;
 	private Propertie selectedProp;
 	private JCheckBox cb_animate;
 	private JSpinner animTimer;
@@ -49,6 +50,7 @@ public class TilesetEditorWin extends JDialog {
 	private void init() {
 		JPanel tmp = new JPanel(new BorderLayout());
 		JPanel propertie = new JPanel(new GridLayout(0, 1));
+		propertie.add(createRow("Tooltip", tooltip = new JTextField()));
 		propertie.add(createRow("Animated Tiles:", cb_animate = new JCheckBox()));
 		cb_animate.addActionListener(a -> {
 			if (selectedProp != null)
@@ -85,6 +87,7 @@ public class TilesetEditorWin extends JDialog {
 				JOptionPane.showMessageDialog(TilesetEditorWin.this, "Please select an Image Source!");
 				return;
 			}
+			selectedProp.toolTip = tooltip.getText();
 			selectedProp.animate = cb_animate.isSelected();
 			selectedProp.animTempo = (byte) (int) animTimer.getValue();
 			selectedProp.src = tf_src.getText();
@@ -202,6 +205,7 @@ public class TilesetEditorWin extends JDialog {
 	}
 
 	private void loadPropertie() {
+		tooltip.setText("");
 		cb_animate.setSelected(false);
 		animTimer.setValue(15);
 		tf_src.setText("");
@@ -211,6 +215,7 @@ public class TilesetEditorWin extends JDialog {
 			selectedProp = null;
 		} else {
 			activateAll(true);
+			tooltip.setText(selectedProp.toolTip);
 			cb_animate.setSelected(selectedProp.animate);
 			animTimer.setValue((int)selectedProp.animTempo);
 			tf_src.setText(selectedProp.src);
@@ -219,6 +224,7 @@ public class TilesetEditorWin extends JDialog {
 	}
 
 	private void activateAll(boolean activate) {
+		tooltip.setEnabled(activate);
 		cb_animate.setEnabled(activate);
 		animTimer.setEnabled(activate);
 		tf_src.setEnabled(activate);

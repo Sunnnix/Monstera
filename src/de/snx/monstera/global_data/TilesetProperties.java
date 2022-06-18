@@ -2,7 +2,6 @@ package de.snx.monstera.global_data;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
@@ -61,6 +60,7 @@ public class TilesetProperties {
 
 	public static class Propertie {
 
+		public String toolTip;
 		public boolean animate;
 		public byte animTempo = 15;
 		public BufferedImage[] animImg;
@@ -70,7 +70,7 @@ public class TilesetProperties {
 		}
 
 		public void loadAnimImage() {
-			if (src == null)
+			if (src == null || src.isEmpty())
 				return;
 			try {
 				int tileSize = Game.TILESIZE;
@@ -86,12 +86,14 @@ public class TilesetProperties {
 		}
 
 		public Propertie(PSFFileIO file) {
+			toolTip = file.readString("tooltip");
 			animate = file.readBoolean("anim");
 			animTempo = file.readByte("anim_tempo");
 			src = file.readString("src");
 		}
 
 		public void save(PSFFileIO file) {
+			file.write("tooltip", toolTip);
 			file.write("anim", animate);
 			System.out.println(animTempo);
 			file.write("anim_tempo", animTempo);

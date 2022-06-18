@@ -13,6 +13,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import de.snx.monstera.Game;
+import de.snx.monstera.global_data.ResourceStrings;
+import de.snx.monstera.global_data.TilesetProperties;
+import de.snx.monstera.global_data.TilesetProperties.Propertie;
+
 @SuppressWarnings("serial")
 public class TilesetPanel extends JTabbedPane {
 
@@ -72,6 +77,60 @@ public class TilesetPanel extends JTabbedPane {
 		return tileset[id].root;
 	}
 
+	// Animation
+	private int[] hovered = new int[] { -1, -1, -1 };
+	private BufferedImage animImg;
+
+	private Propertie latestProp;
+	private Thread animator;
+
+	private void prepareAnimation(Propertie prop) {
+		if (prop.equals(latestProp))
+			return;
+		latestProp = prop;
+		if (!prop.animate) {
+			if (animator != null)
+				animator.interrupt();
+			animImg = null;
+			return;
+		}
+		if (animator != null)
+			animator.interrupt();
+		animator = new Thread() {
+			int animTImer, index;
+			BufferedImage[] animation;
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(800);
+					BufferedImage root = ImageIO.read(getClass().getResource(
+							ResourceStrings.S_TILESET_PATH + "animations/" + prop.src + ResourceStrings.IMG_TYPE));
+					animation = new BufferedImage[root.getHeight() / Game.TILESIZE];
+					for (int i = 0; i < animation.length; i++)
+						animation[i] = root.getSubimage(0, i * Game.TILESIZE, Game.TILESIZE, Game.TILESIZE);
+					animImg = animation[0];
+					while (!animator.isInterrupted()) {
+						Thread.sleep(16);
+						animTImer++;
+						if (animTImer >= prop.animTempo) {
+							animTImer = 0;
+							index++;
+							if (index >= animation.length)
+								index = 0;
+							animImg = animation[index];
+							repaint();
+						}
+					}
+				} catch (InterruptedException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		animator.start();
+	}
+
 	private class Tileset extends JPanel {
 
 		private final int id;
@@ -107,8 +166,11 @@ public class TilesetPanel extends JTabbedPane {
 			if (tiles == null)
 				return;
 			for (int i = 0; i < tiles.length; i++) {
-				g.drawImage(tiles[i % width + i / width * width], i % width * TILESIZE, i / width * TILESIZE, TILESIZE,
-						TILESIZE, null);
+				if (hovered[0] == id && hovered[1] == i % width && hovered[2] == i / width && animImg != null)
+					g.drawImage(animImg, i % width * TILESIZE, i / width * TILESIZE, TILESIZE, TILESIZE, null);
+				else
+					g.drawImage(tiles[i % width + i / width * width], i % width * TILESIZE, i / width * TILESIZE,
+							TILESIZE, TILESIZE, null);
 			}
 			if (selected[0] == id) {
 				g.setColor(Color.GREEN);
@@ -176,6 +238,19 @@ public class TilesetPanel extends JTabbedPane {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1)
 					pressed = false;
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int x, y;
+				x = e.getX() / Game.TILESIZE;
+				y = e.getY() / Game.TILESIZE;
+				Propertie prop = TilesetProperties.getPropertie(new int[] { id, x + y * width });
+				Tileset.this.setToolTipText(prop.toolTip);
+				hovered[0] = id;
+				hovered[1] = x;
+				hovered[2] = y;
+				prepareAnimation(prop);
 			}
 		}
 	}
