@@ -14,7 +14,6 @@ import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.battle.BattleGroup;
 import de.snx.monstera.data.battle.Battler;
 import de.snx.monstera.data.battle.Battler.AbilityData;
-import de.snx.monstera.global_data.Keys;
 import lombok.Setter;
 
 public class BattleState extends GameState {
@@ -199,8 +198,6 @@ public class BattleState extends GameState {
 
 	@Override
 	protected void keyEvents(GameStateManager gsm) {
-		if (Keys.DEBUG.isPressed())
-			drawDebug = !drawDebug;
 		if (runAction != null)
 			runAction.keys();
 	}

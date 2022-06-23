@@ -11,6 +11,13 @@ import de.snx.monstera.data.mapdata.Map;
 import de.snx.monstera.event.Event;
 import de.snx.monstera.global_data.Keys;
 
+/**
+ * This GameState is responsible for playing the overworld. The player and all
+ * other events on the map move on it.
+ * 
+ * @author Sunnix
+ *
+ */
 public class WorldState extends GameState {
 
 	private Event runningEvent;
@@ -19,54 +26,6 @@ public class WorldState extends GameState {
 	public WorldState(int id) {
 		super(id);
 		camera = new Rectangle(0, 0, Game.DEFAULT_SIZE.width, Game.DEFAULT_SIZE.height);
-//		// TODO temp solution ====
-//		player = new Entity(0);
-//		player.setImage(Entitys.PLAYER);
-//		// TODO =================
-//		setBackgroundColor(Color.BLACK);
-//		String fileName = "test";
-//		int[] pMapID = new int[] { -1 };
-//		int[] map_ids = new int[0];
-//		try (PSFFileIO file = new PSFFileIO(ResourceStrings.TILESET_PATH + "properties.prop", "r")) {
-//			ProjectHandler.getTilesets().getProperties().load(file);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + ".mgame")) {
-//			map_ids = file.readIntArray("maps");
-//			file.room("player", _s -> {
-//				pMapID[0] = file.readInt("map_id");
-//				player.setPos(file.readDouble("x"), file.readDouble("y"));
-//				player.setDirection(file.readInt("direction"));
-//			});
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/abilities.dat")) {
-//			Ability.loadAll(file);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/monsters.dat")) {
-//			MonsterType.loadAll(file);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/groups.dat")) {
-//			CombatGroups.loadAll(file);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		for (int map : map_ids) {
-//			try (PSFFileIO file = new PSFFileIO("de/snx/monstera/map/" + fileName + "/map" + map + ".dat")) {
-//				Map tmp = new Map(file);
-//				loadedMaps.add(tmp);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		if (pMapID[0] != -1)
-//			ProjectHandler.getMaps().transferPlayer(pMapID[0], (int) player.getX(), (int) player.getY());
 	}
 
 	@Override
@@ -76,8 +35,6 @@ public class WorldState extends GameState {
 	@Override
 	protected void keyEvents(GameStateManager gsm) {
 		Entity player = ProjectHandler.getMaps().getPlayer();
-		if (Keys.DEBUG.isPressed())
-			drawDebug = !drawDebug;
 		Map map = ProjectHandler.getMaps().getSelected();
 		if (runningEvent != null) {
 			if (Keys.CONFIRM.isPressed())

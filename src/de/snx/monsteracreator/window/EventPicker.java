@@ -9,7 +9,7 @@ import javax.swing.JDialog;
 
 import de.snx.monstera.data.mapdata.Entity;
 import de.snx.monstera.event.Event;
-import de.snx.monstera.global_data.Registry;
+import de.snx.monstera.global_data.EventRegistry;
 
 @SuppressWarnings("serial")
 public class EventPicker extends JDialog {
@@ -30,12 +30,12 @@ public class EventPicker extends JDialog {
 	}
 
 	private void initEventButtons() {
-		List<String> events = Registry.getAllEvents();
+		List<String> events = EventRegistry.getAllEvents();
 		for (int i = 0; i < events.size(); i++) {
 			final String key = events.get(i);
 			JButton b = new JButton(key);
 			b.addActionListener(a -> {
-				openEventDialog(Registry.createEvent(key));
+				openEventDialog(EventRegistry.createEvent(key));
 			});
 			add(b);
 		}

@@ -3,6 +3,12 @@ package de.snx.monstera.global_data;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+/**
+ * Listing of all used keys as variables
+ * 
+ * @author Sunnix
+ *
+ */
 public class Keys {
 
 	public static final int ACTION_PRESS = 0;

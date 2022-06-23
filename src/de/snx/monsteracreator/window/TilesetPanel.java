@@ -68,6 +68,7 @@ public class TilesetPanel extends JTabbedPane {
 	private class Tileset extends JPanel {
 
 		private final int id;
+		private BufferedImage latestTS;
 
 		public Tileset(int id) {
 			this.id = id;
@@ -90,6 +91,11 @@ public class TilesetPanel extends JTabbedPane {
 			BufferedImage tileset = tilesets.getFull(id, animTimer);
 			if (tileset == null)
 				return;
+			if (!tileset.equals(latestTS)) {
+				latestTS = tileset;
+				setPreferredSize(new Dimension(tileset.getWidth(), tileset.getHeight()));
+				revalidate();
+			}
 			g.drawImage(tileset, 0, 0, null);
 			int[] selected = tilesets.getSelected();
 			if (selected[0] == id) {

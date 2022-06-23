@@ -1,12 +1,12 @@
 package de.snx.monstera.data;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import de.snx.monstera.global_data.ResourceStrings;
 import de.snx.psf.PSFFileIO;
 
 public class TilesetProperties {
@@ -91,8 +91,8 @@ public class TilesetProperties {
 			}
 			try {
 				int tileSize = ProjectHandler.getProject().getTilesize();
-				BufferedImage root = ImageIO.read(getClass()
-						.getResource(ResourceStrings.S_TILESET_PATH + "animations/" + src + ResourceStrings.IMG_TYPE));
+				BufferedImage root = ImageIO.read(new File(
+						ProjectHandler.getProject().getResourcePath() + "graphic/tileset/animations/" + src + ".png"));
 				int height = root.getHeight() / tileSize;
 				animImg = new BufferedImage[height];
 				for (int i = 0; i < height; i++)

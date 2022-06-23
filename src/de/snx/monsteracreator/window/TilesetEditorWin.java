@@ -16,7 +16,6 @@ import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.TilesetProperties;
 import de.snx.monstera.data.TilesetProperties.Propertie;
 import de.snx.monstera.data.Tilesets;
-import de.snx.monstera.global_data.ResourceStrings;
 import de.snx.monsteracreator.Config;
 
 @SuppressWarnings("serial")
@@ -186,7 +185,8 @@ public class TilesetEditorWin extends JDialog {
 	}
 
 	private void openResourceDialog() {
-		JFileChooser chooser = new JFileChooser(new File(ResourceStrings.TILESET_PATH + "animations/"));
+		JFileChooser chooser = new JFileChooser(
+				new File(ProjectHandler.getProject().getResourcePath() + "graphic/tileset/animations"));
 		chooser.setFileFilter(new FileFilter() {
 
 			@Override

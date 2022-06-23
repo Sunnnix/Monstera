@@ -7,6 +7,14 @@ import java.util.ArrayList;
 
 import de.snx.monstera.global_data.Keys;
 
+/**
+ * 
+ * Main process of the current event. <br>
+ * Everything that the game should do in the runtime can be determined here.
+ * 
+ * @author Sunnix
+ *
+ */
 public abstract class GameState {
 
 	private static final Color DEBUG_BACKGROUND_COLOR = new Color(0, 0, 0, 100), DEBUG_TEXT_COLOR = Color.WHITE;
@@ -15,7 +23,6 @@ public abstract class GameState {
 	public final int ID;
 
 	private ArrayList<String> debugText = new ArrayList<>();
-	protected boolean drawDebug;
 	private Color backgroundColor;
 
 	public GameState(int id) {
@@ -31,9 +38,12 @@ public abstract class GameState {
 	}
 
 	protected final void _update(GameStateManager gsm, int ticks) {
+		if (Keys.DEBUG.isPressed())
+			gsm.drawDebug = !gsm.drawDebug;
 		keyEvents(gsm);
 		Keys.update();
 		update(gsm, ticks);
+		debugText.clear();
 	}
 
 	/**
@@ -56,7 +66,7 @@ public abstract class GameState {
 			g.fillRect(0, 0, gsm.windowWidth(), gsm.windowHeight());
 		}
 		render(gsm, g);
-		if (drawDebug)
+		if (gsm.drawDebug)
 			drawDebug(g);
 	}
 
@@ -64,9 +74,16 @@ public abstract class GameState {
 
 	}
 
+	/**
+	 * Here text should be added in the
+	 * {@link GameState#update(GameStateManager, int)} or
+	 * {@link GameState#render(GameStateManager, Graphics2D)} to display it
+	 * correctly in the debug menu
+	 * 
+	 * @param text text to show
+	 */
 	public void addDebugText(String text) {
-		if (drawDebug)
-			debugText.add(text);
+		debugText.add(text);
 	}
 
 	private void drawDebug(Graphics2D g) {

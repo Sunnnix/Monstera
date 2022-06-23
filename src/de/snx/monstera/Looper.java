@@ -2,12 +2,25 @@ package de.snx.monstera;
 
 import java.util.function.Consumer;
 
+/**
+ * The looper is responsible for the gameloop.<br>
+ * It calculates the time after which it performs the updates.
+ * 
+ * @author Sunnix
+ *
+ */
 public class Looper extends Thread {
 
 	private boolean running;
 	private int ticks;
 	private Consumer<Integer> run;
 
+	/**
+	 * Creates a new Looper
+	 * 
+	 * @param ticks how often this looper calls the update function per second
+	 * @param run   the function to be updated, with transfer of the ticks/s
+	 */
 	public Looper(int ticks, Consumer<Integer> run) {
 		super("looper");
 		this.ticks = ticks;

@@ -5,7 +5,7 @@ import de.snx.monstera.event.MoveEvent;
 import de.snx.monstera.event.TeleportEvent;
 import de.snx.monstera.event.TextEvent;
 import de.snx.monstera.event.TransferPlayerEvent;
-import de.snx.monstera.global_data.Registry;
+import de.snx.monstera.global_data.EventRegistry;
 import de.snx.monsteracreator.Creator;
 
 public class Main {
@@ -18,12 +18,15 @@ public class Main {
 			new Game();
 	}
 
+	/**
+	 * All events should be registered here
+	 */
 	public static void registerAll() {
-		Registry.registerEvent(TextEvent.class);
-		Registry.registerEvent(TeleportEvent.class);
-		Registry.registerEvent(TransferPlayerEvent.class);
-		Registry.registerEvent(BattleEvent.class);
-		Registry.registerEvent(MoveEvent.class);
+		EventRegistry.registerEvent(TextEvent.class);
+		EventRegistry.registerEvent(TeleportEvent.class);
+		EventRegistry.registerEvent(TransferPlayerEvent.class);
+		EventRegistry.registerEvent(BattleEvent.class);
+		EventRegistry.registerEvent(MoveEvent.class);
 	}
 
 }

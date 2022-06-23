@@ -2,6 +2,12 @@ package de.snx.monstera.state;
 
 import java.awt.Color;
 
+/**
+ * Currently there is no menu and this GameState is skipped after little time
+ * 
+ * @author Sunnix
+ *
+ */
 public class MenuState extends GameState {
 
 	private int timer = 10; // Time to next state

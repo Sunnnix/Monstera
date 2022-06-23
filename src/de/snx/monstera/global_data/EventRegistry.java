@@ -5,14 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.snx.monstera.data.battle.Ability;
 import de.snx.monstera.event.Event;
 import de.snx.psf.PSFFileIO;
 
-public class Registry {
+/**
+ * 
+ * Registry for creating from constructor new Events from
+ * {@link Event#REGISTRY_NAME} using reflexion
+ * 
+ * @author Sunnix
+ *
+ */
+public class EventRegistry {
 
 	private static HashMap<String, Class<? extends Event>> event = new HashMap<>();
-	private static HashMap<String, Ability> abilities = new HashMap<>();
 
 	public static final void registerEvent(Class<? extends Event> clazz) {
 		try {
@@ -58,26 +64,6 @@ public class Registry {
 
 	public static List<String> getAllEvents() {
 		return new ArrayList<String>(event.keySet().stream().collect(Collectors.toList()));
-	}
-
-	public static Ability registerAbility(Ability ability) {
-		abilities.put(ability.getName(), ability);
-		return ability;
-	}
-
-	public static Ability loadAbility(String key, PSFFileIO file) {
-		Ability a = null;
-		try {
-			a = Ability.class.getConstructor(PSFFileIO.class).newInstance(file);
-			abilities.put(a.getName(), a);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return a;
-	}
-
-	public static Ability getAbility(String key) {
-		return abilities.get(key);
 	}
 
 }

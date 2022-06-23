@@ -30,7 +30,7 @@ public class Window extends Canvas {
 	}
 
 	private void setFrame() {
-		frame = new JFrame(Game.NAME);
+		frame = new JFrame("Monstera Game");
 		frame.add(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);

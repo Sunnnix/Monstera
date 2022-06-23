@@ -9,10 +9,20 @@ import java.nio.file.Files;
 
 import org.json.JSONObject;
 
+/**
+ * 
+ * The Config is the class that stores all sorts of information about the
+ * Creator such as position of the window, size, colors, etc.. Due to the static
+ * access, the data can be retrieved and changed at any time. They are stored in
+ * the creator.config after closing and read out again when reopening.
+ * 
+ * @author Sunnix
+ *
+ */
 public class Config {
 
 	public static Rectangle windowBounds = new Rectangle();
-	public static String projectsPath = "";
+	public static String projectsPath = ""; // The latest opened file path
 	private static Color[] editorColors;
 	public static final int C_MAP_VIEW_BACKGROUND = 0;
 	public static final int C_TILESET_BACKGROUND = 1;
@@ -45,6 +55,9 @@ public class Config {
 		editorColors[12] = new Color(80, 200, 80);
 	}
 
+	/**
+	 * Loads the creator.config file into the fields
+	 */
 	public static void load() {
 		try {
 			File configFile = new File("creator.config");
@@ -62,6 +75,9 @@ public class Config {
 		}
 	}
 
+	/**
+	 * Saves the data from the fields into the creator.config file as JSON
+	 */
 	public static void save() {
 		JSONObject json = new JSONObject();
 		saveWindowSettings(json);
@@ -115,12 +131,23 @@ public class Config {
 		json.put("colors", colorsJson);
 	}
 
+	/**
+	 * Get the specific color of the selected variable
+	 * 
+	 * @param id id of color (use static fields of {@link Config})
+	 * @return returns the Color value or Black if id is wrong
+	 */
 	public static Color getEditorColor(int id) {
 		if (id < 0 || id >= editorColors.length)
 			return Color.BLACK;
 		return editorColors[id];
 	}
 
+	/**
+	 * Set the specific color of the selected variable
+	 * 
+	 * @param id id of color (use static fields of {@link Config})
+	 */
 	public static void setEditorColor(int id, Color color) {
 		if (id >= 0 || id < editorColors.length)
 			editorColors[id] = color;

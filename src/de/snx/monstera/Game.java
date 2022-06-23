@@ -14,9 +14,15 @@ import de.snx.monstera.state.IntroState;
 import de.snx.monstera.state.MenuState;
 import de.snx.monstera.state.WorldState;
 
+/**
+ * Prepares everything for the game and starts the GameWindow. All resources
+ * will be loaded after a game is selected.
+ * 
+ * @author Sunnix
+ *
+ */
 public class Game {
 
-	public static final String NAME = "Pokemon";
 	public static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
 	public static final int TICKS = 60;
 
@@ -29,6 +35,9 @@ public class Game {
 		init();
 	}
 
+	/**
+	 * Prepare game independent data
+	 */
 	private void preInit() {
 		System.setOut(new PrintStream(System.out) {
 			@Override
@@ -112,12 +121,16 @@ public class Game {
 		gsm = new GameStateManager(this);
 	}
 
+	/**
+	 * Load and start game
+	 */
 	private void init() {
 		window.setVisible();
 		if (!ProjectHandler.loadProject(window.getFrame())) {
 			JOptionPane.showMessageDialog(window, "Error loading data!");
 			System.exit(-1);
 		}
+		window.getFrame().setTitle(ProjectHandler.getProject().getName());
 		gsm.registerStates(0, new IntroState(0), new MenuState(1), new WorldState(2), new BattleState(3));
 		looper = new Looper(TICKS, i -> {
 			update(i);

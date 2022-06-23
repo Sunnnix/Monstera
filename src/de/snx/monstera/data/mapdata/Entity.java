@@ -9,7 +9,7 @@ import de.snx.monstera.Game;
 import de.snx.monstera.data.IValueID;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.event.Event;
-import de.snx.monstera.global_data.Registry;
+import de.snx.monstera.global_data.EventRegistry;
 import de.snx.monstera.state.WorldState;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -72,7 +72,7 @@ public class Entity implements IValueID {
 			for (int i = 0; i < size; i++) {
 				int index = i;
 				file.room("e" + index, st -> {
-					events.add(Registry.createEventFromFile(file.readString("registry_name"), file));
+					events.add(EventRegistry.createEventFromFile(file.readString("registry_name"), file));
 				});
 			}
 		});
