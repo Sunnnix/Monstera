@@ -37,12 +37,12 @@ public class Config {
 		editorColors[4] = Color.RED;
 		editorColors[5] = Color.RED;
 		editorColors[6] = Color.MAGENTA;
-		editorColors[7] = new Color(100, 150, 200, 180);
-		editorColors[8] = new Color(160, 80, 200, 180);
+		editorColors[7] = new Color(100, 150, 200);
+		editorColors[8] = new Color(160, 80, 200);
 		editorColors[9] = Color.GREEN;
 		editorColors[10] = Color.GREEN;
 		editorColors[11] = Color.MAGENTA;
-		editorColors[12] = new Color(80, 200, 80, 100);
+		editorColors[12] = new Color(80, 200, 80);
 	}
 
 	public static void load() {
@@ -105,7 +105,7 @@ public class Config {
 	private static void loadColors(JSONObject json) {
 		JSONObject colorsJson = json.getJSONObject("colors");
 		for (int i = 0; i < editorColors.length; i++)
-			editorColors[i] = new Color(colorsJson.getInt(String.valueOf(i)));
+			editorColors[i] = new Color(colorsJson.getInt(String.valueOf(i)), true);
 	}
 
 	private static void saveColors(JSONObject json) {
@@ -119,6 +119,11 @@ public class Config {
 		if (id < 0 || id >= editorColors.length)
 			return Color.BLACK;
 		return editorColors[id];
+	}
+
+	public static void setEditorColor(int id, Color color) {
+		if (id >= 0 || id < editorColors.length)
+			editorColors[id] = color;
 	}
 
 }

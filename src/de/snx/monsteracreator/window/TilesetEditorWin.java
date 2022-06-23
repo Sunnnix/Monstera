@@ -1,7 +1,6 @@
 package de.snx.monsteracreator.window;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -18,6 +17,7 @@ import de.snx.monstera.data.TilesetProperties;
 import de.snx.monstera.data.TilesetProperties.Propertie;
 import de.snx.monstera.data.Tilesets;
 import de.snx.monstera.global_data.ResourceStrings;
+import de.snx.monsteracreator.Config;
 
 @SuppressWarnings("serial")
 public class TilesetEditorWin extends JDialog {
@@ -148,7 +148,7 @@ public class TilesetEditorWin extends JDialog {
 							int pX, pY;
 							pX = x * tileSize;
 							pY = y * tileSize;
-							g.setColor(new Color(255, 0, 255, 100));
+							g.setColor(Config.getEditorColor(Config.C_TILESET_E_PROPERTIE));
 							g.drawRect(pX, pY, tileSize, tileSize);
 							g.drawRect(pX + 1, pY + 1, tileSize - 2, tileSize - 2);
 							for (int i = 0; i < tileSize / 2; i++)
@@ -159,7 +159,7 @@ public class TilesetEditorWin extends JDialog {
 						}
 						if (selected[0] == tileChooser.getSelectedIndex() && selected[1] % (width) == x
 								&& selected[1] / (width) == y) {
-							g.setColor(Color.GREEN);
+							g.setColor(Config.getEditorColor(Config.C_TILESET_E_SELECTED));
 							g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
 						}
 					}
