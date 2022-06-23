@@ -1,7 +1,7 @@
 package de.snx.monstera.battle.action;
 
-import de.snx.monstera.battle.Battler;
-import de.snx.monstera.battle.Battler.AbilityData;
+import de.snx.monstera.data.battle.Battler;
+import de.snx.monstera.data.battle.Battler.AbilityData;
 import de.snx.monstera.state.BattleState;
 
 public class ActionUseAbility extends BattleAction {

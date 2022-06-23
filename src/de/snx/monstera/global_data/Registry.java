@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.snx.monstera.battle.Ability;
-import de.snx.monstera.map.event.Event;
+import de.snx.monstera.data.battle.Ability;
+import de.snx.monstera.event.Event;
 import de.snx.psf.PSFFileIO;
 
 public class Registry {
@@ -61,7 +61,7 @@ public class Registry {
 	}
 
 	public static Ability registerAbility(Ability ability) {
-		abilities.put(ability.name, ability);
+		abilities.put(ability.getName(), ability);
 		return ability;
 	}
 
@@ -69,7 +69,7 @@ public class Registry {
 		Ability a = null;
 		try {
 			a = Ability.class.getConstructor(PSFFileIO.class).newInstance(file);
-			abilities.put(a.name, a);
+			abilities.put(a.getName(), a);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

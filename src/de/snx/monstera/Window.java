@@ -12,11 +12,13 @@ import java.util.function.Consumer;
 import javax.swing.JFrame;
 
 import de.snx.monstera.global_data.Keys;
+import lombok.Getter;
 
 @SuppressWarnings("serial")
 public class Window extends Canvas {
 
 	private Game game;
+	@Getter
 	private JFrame frame;
 
 	private boolean createBuffer = true;

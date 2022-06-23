@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
 
-import de.snx.monstera.battle.Battler;
-import de.snx.monstera.battle.Battler.AbilityData;
+import de.snx.monstera.data.battle.Battler;
+import de.snx.monstera.data.battle.Battler.AbilityData;
 import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.state.BattleState;
 import de.snx.monstera.state.GameStateManager;
@@ -49,7 +49,10 @@ public class ActionPlayerChoose extends BattleAction implements IDrawable {
 			if (Keys.CONFIRM.isPressed())
 				switch (mainPointer) {
 				case 0:
-					menu = ATTACK_MENU;
+					if (playerMoves.length == 0 || !hasAvailableMoves(playerMoves))
+						attack(-1);
+					else
+						menu = ATTACK_MENU;
 					break;
 				case 1:
 					menu = MONSTER_MENU;
@@ -120,8 +123,18 @@ public class ActionPlayerChoose extends BattleAction implements IDrawable {
 
 	private void attack(int move) {
 		finished = true;
-		AbilityData pAb = playerMoves[move];
-		AbilityData eAb = enemyMoves[(int) (Math.random() * enemyMoves.length)];
+		AbilityData pAb;
+		if (move == -1) {
+			pAb = state.getPlayer().getStrugle();
+			state.addNextAction(new ActionShowText(state, state.getPlayer().getName() + " has no more moves!"));
+		} else
+			pAb = playerMoves[move];
+		AbilityData eAb;
+		if (enemyMoves.length == 0 || !hasAvailableMoves(enemyMoves)) {
+			eAb = state.getEnemy().getStrugle();
+			state.addNextAction(new ActionShowText(state, state.getEnemy().getName() + " has no more moves!"));
+		} else
+			eAb = enemyMoves[(int) (Math.random() * enemyMoves.length)];
 		state.addNextAction(new ActionShowText(state, state.getPlayer().getName() + " uses " + pAb.getName() + "!"));
 		state.addNextAction(new ActionUseAbility(state, true, pAb, true));
 		state.addNextAction(new ActionShowText(state, state.getEnemy().getName() + " uses " + eAb.getName() + "!"));
@@ -177,6 +190,13 @@ public class ActionPlayerChoose extends BattleAction implements IDrawable {
 		default:
 			break;
 		}
+	}
+
+	private boolean hasAvailableMoves(AbilityData[] abilities) {
+		for (AbilityData ability : abilities)
+			if (ability.getAp() > 0)
+				return true;
+		return false;
 	}
 
 }

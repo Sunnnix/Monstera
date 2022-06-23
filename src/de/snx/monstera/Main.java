@@ -1,18 +1,19 @@
 package de.snx.monstera;
 
-import de.snx.monstera.creator.CreatorWindow;
+import de.snx.monstera.event.BattleEvent;
+import de.snx.monstera.event.MoveEvent;
+import de.snx.monstera.event.TeleportEvent;
+import de.snx.monstera.event.TextEvent;
+import de.snx.monstera.event.TransferPlayerEvent;
 import de.snx.monstera.global_data.Registry;
-import de.snx.monstera.map.event.BattleEvent;
-import de.snx.monstera.map.event.MoveEvent;
-import de.snx.monstera.map.event.TeleportEvent;
-import de.snx.monstera.map.event.TextEvent;
-import de.snx.monstera.map.event.TransferPlayerEvent;
+import de.snx.monsteracreator.Creator;
 
 public class Main {
 
 	public static void main(String[] args) {
-		if (args.length > 0 && "creator".equals(args[0]))
-			new CreatorWindow();
+		registerAll();
+		if (args.length > 0 && args[0].equals("creator"))
+			new Creator();
 		else
 			new Game();
 	}

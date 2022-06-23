@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
 
-import de.snx.monstera.battle.Battler;
+import de.snx.monstera.data.battle.Battler;
 import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.state.BattleState;
 import de.snx.monstera.state.GameStateManager;

@@ -6,15 +6,14 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import de.snx.monstera.Game;
-import de.snx.monstera.battle.BattleGroup;
-import de.snx.monstera.battle.Battler;
-import de.snx.monstera.battle.Battler.AbilityData;
-import de.snx.monstera.battle.MonsterType;
 import de.snx.monstera.battle.action.ActionEncounter;
 import de.snx.monstera.battle.action.BattleAction;
 import de.snx.monstera.battle.action.IDrawable;
-import de.snx.monstera.global_data.CombatGroups;
+import de.snx.monstera.data.Monsters;
+import de.snx.monstera.data.ProjectHandler;
+import de.snx.monstera.data.battle.BattleGroup;
+import de.snx.monstera.data.battle.Battler;
+import de.snx.monstera.data.battle.Battler.AbilityData;
 import de.snx.monstera.global_data.Keys;
 import lombok.Setter;
 
@@ -49,8 +48,9 @@ public class BattleState extends GameState {
 		super(id);
 		setBackgroundColor(Color.WHITE);
 		// TODO currenrly hardcoded
-		player = new Battler[] { new Battler(5, MonsterType.getMonsterType(1)),
-				new Battler(12, MonsterType.getMonsterType(2)), new Battler(100, MonsterType.getMonsterType(0)) };
+		Monsters mon = ProjectHandler.getMonsters();
+		player = new Battler[] { new Battler(20, mon.getValue(1)), new Battler(12, mon.getValue(2)),
+				new Battler(100, mon.getValue(0)) };
 	}
 
 	@Override
@@ -61,10 +61,10 @@ public class BattleState extends GameState {
 		showEnemyGUI = false;
 		BattleGroup group;
 		try {
-			group = CombatGroups.getGroup(Integer.parseInt(args[0]));
+			group = ProjectHandler.getGroups().getValue(Integer.parseInt(args[0]));
 		} catch (Exception e) {
 			e.printStackTrace();
-			group = CombatGroups.getGroup(0);
+			group = ProjectHandler.getGroups().getValue(0);
 		}
 		enemy = group.getBattlers();
 		text = new String[0];
@@ -92,11 +92,11 @@ public class BattleState extends GameState {
 		b1Y = 130 + eOffsetY;
 		b2Y = gsm.windowHeight() - 255 + pOffsetY;
 		if (showEnemy)
-			g.drawImage(b1, b1X - (int) (b1.getWidth() * Game.SCALE / 2), b1Y - (int) (b1.getHeight() * Game.SCALE / 2),
-					(int) (b1.getWidth() * Game.SCALE), (int) (b1.getHeight() * Game.SCALE), null);
+			g.drawImage(b1, b1X - (int) (b1.getWidth() * 2 / 2), b1Y - (int) (b1.getHeight() * 2 / 2),
+					(int) (b1.getWidth() * 2), (int) (b1.getHeight() * 2), null);
 		if (showPlayer)
-			g.drawImage(b2, b2X - (int) (b2.getWidth() * Game.SCALE / 2), b2Y - (int) (b2.getHeight() * Game.SCALE / 2),
-					(int) (b2.getWidth() * Game.SCALE), (int) (b2.getHeight() * Game.SCALE), null);
+			g.drawImage(b2, b2X - (int) (b2.getWidth() * 2 / 2), b2Y - (int) (b2.getHeight() * 2 / 2),
+					(int) (b2.getWidth() * 2), (int) (b2.getHeight() * 2), null);
 	}
 
 	private void renderTextBox(GameStateManager gsm, Graphics2D g) {

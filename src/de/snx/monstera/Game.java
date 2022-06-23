@@ -5,7 +5,9 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import de.snx.monstera.map.Tiles;
+import javax.swing.JOptionPane;
+
+import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.state.BattleState;
 import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.IntroState;
@@ -16,9 +18,6 @@ public class Game {
 
 	public static final String NAME = "Pokemon";
 	public static final Dimension DEFAULT_SIZE = new Dimension(800, 600);
-	public static final double SCALE = 2;
-	public static final int TILESIZE = 24;
-	public static final int S_TILESIZE = (int) (TILESIZE * SCALE);
 	public static final int TICKS = 60;
 
 	private Window window;
@@ -109,28 +108,22 @@ public class Game {
 			}
 
 		});
-		loadRes();
 		window = new Window(this);
 		gsm = new GameStateManager(this);
 	}
 
 	private void init() {
 		window.setVisible();
+		if (!ProjectHandler.loadProject(window.getFrame())) {
+			JOptionPane.showMessageDialog(window, "Error loading data!");
+			System.exit(-1);
+		}
 		gsm.registerStates(0, new IntroState(0), new MenuState(1), new WorldState(2), new BattleState(3));
 		looper = new Looper(TICKS, i -> {
 			update(i);
 			render(i);
 		});
 		looper.start();
-	}
-
-	private void loadRes() {
-		registerEvents();
-		Tiles.loadRes();
-	}
-
-	private void registerEvents() {
-		Main.registerAll();
 	}
 
 	private void update(int ticks) {
