@@ -151,28 +151,37 @@ public class ProjectHandler {
 
 	/**
 	 * For Game
+	 * 
+	 * @param projectArgs the project path and name, if the user starts this game
+	 *                    from the creator, otherwise null
 	 */
-	public static boolean loadProject(JFrame frame) {
-		JFileChooser chooser = new JFileChooser(Config.projectsPath);
-		chooser.setFileFilter(new FileFilter() {
+	public static boolean loadProject(JFrame frame, String[] projectArgs) {
+		File projectFile;
+		if (projectArgs == null) {
+			JFileChooser chooser = new JFileChooser(Config.projectsPath);
+			chooser.setFileFilter(new FileFilter() {
 
-			@Override
-			public String getDescription() {
-				return "Monstera Game (.mgame)";
-			}
+				@Override
+				public String getDescription() {
+					return "Monstera Game (.mgame)";
+				}
 
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().endsWith(".mgame");
-			}
-		});
-		if (chooser.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
-			return false;
-		Config.projectsPath = chooser.getSelectedFile().getParent();
-		try (PSFFileIO file = new PSFFileIO(chooser.getSelectedFile(), "r")) {
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory() || f.getName().endsWith(".mgame");
+				}
+			});
+			if (chooser.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+				return false;
+			projectFile = chooser.getSelectedFile();
+			Config.projectsPath = projectFile.getParent();
+		} else {
+			projectFile = new File(projectArgs[0], projectArgs[1] + ".mgame");
+		}
+		try (PSFFileIO file = new PSFFileIO(projectFile, "r")) {
 			int tilesize = file.readInt("tilesize", 24);
 			String name = file.readString("name");
-			project = new Project(tilesize, name, chooser.getSelectedFile().getParentFile());
+			project = new Project(tilesize, name, projectFile.getParentFile());
 			setUpResources();
 			maps = new Maps();
 			maps.load(project);

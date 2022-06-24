@@ -9,8 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JSeparator;
 
+import de.snx.monstera.Main;
 import de.snx.monsteracreator.window.MapViewPanel.Mode;
 import de.snx.monsteracreator.window.MapViewPanel.Shape;
+import lombok.Getter;
 
 /**
  * for all imagebutton menus
@@ -23,6 +25,8 @@ public class ToolBar extends JMenuBar {
 	private Window win;
 
 	private JButton b_draw, b_blocking, b_entity, b_layer, b_single_tile, b_rect_tile, b_circle_tile, b_fill_tile;
+	@Getter
+	private JButton b_start_game;
 
 	private ImageIcon[] layerImg;
 
@@ -52,6 +56,13 @@ public class ToolBar extends JMenuBar {
 		add(b_rect_tile = button("rectangle_tile", "Draw in Rectangle Shape", a -> win.setDrawShape(Shape.RECT)));
 		add(b_circle_tile = button("circle_tile", "Draw in Circle Shape", a -> win.setDrawShape(Shape.CIRCLE)));
 		add(b_fill_tile = button("fill_tile", "Fill Tiles", a -> win.setDrawShape(Shape.FILL)));
+		add(new JSeparator());
+		add(b_start_game = button("start_game", "Start Game", e -> {
+			if (b_start_game.isSelected())
+				Main.stopGameProcess(win);
+			else
+				Main.startGameProcess(win);
+		}));
 	}
 
 	private JButton button(String img, boolean sImg, String tooltip, ActionListener a) {

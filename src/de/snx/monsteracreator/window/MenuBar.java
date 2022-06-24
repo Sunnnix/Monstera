@@ -4,6 +4,7 @@ import static java.awt.event.InputEvent.*;
 import static java.awt.event.KeyEvent.*;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
@@ -12,6 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
+import de.snx.monstera.Main;
 import de.snx.monstera.data.ProjectHandler;
 
 @SuppressWarnings("serial")
@@ -20,6 +22,7 @@ public class MenuBar extends JMenuBar {
 	private Window win;
 
 	private JMenu edit, mode, layer;
+	private JMenuItem startGame, stopGame;
 
 	public MenuBar(Window win) {
 		this.win = win;
@@ -31,6 +34,7 @@ public class MenuBar extends JMenuBar {
 		add(initEditMenu(edit = new JMenu("Edit")));
 		add(initModeMenu(mode = new JMenu("Mode")));
 		add(initLayerMenu(layer = new JMenu("Layer")));
+		add(initHelpMenu(new JMenu("Help")));
 		activateAll(false);
 	}
 
@@ -55,7 +59,8 @@ public class MenuBar extends JMenuBar {
 		bindMenu(menu, new JMenuItem("Switch Map"), KeyStroke.getKeyStroke(VK_O, CTRL_MASK),
 				e -> ProjectHandler.getMaps().showSwitchDialog(win));
 		bindMenu(menu, new JMenuItem("Edit Map"), null, e -> ProjectHandler.getMaps().editMap(win));
-		bindMenu(menu, new JMenuItem("Delete Map"), KeyStroke.getKeyStroke(VK_D, CTRL_MASK), e -> ProjectHandler.getMaps().deleteCurrent(win));
+		bindMenu(menu, new JMenuItem("Delete Map"), KeyStroke.getKeyStroke(VK_D, CTRL_MASK),
+				e -> ProjectHandler.getMaps().deleteCurrent(win));
 		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Edit Tileset Properties"), KeyStroke.getKeyStroke(VK_T, ALT_MASK),
 				e -> ProjectHandler.getTilesets().editProperties(win));
@@ -65,6 +70,12 @@ public class MenuBar extends JMenuBar {
 				e -> new EditMonster(win));
 		bindMenu(menu, new JMenuItem("Edit Groups"), KeyStroke.getKeyStroke(VK_G, ALT_MASK),
 				e -> new EditGroupsWin(win));
+		menu.add(new JSeparator());
+		bindMenu(menu, startGame = new JMenuItem("Start Game"), KeyStroke.getKeyStroke(VK_F11, 0),
+				e -> Main.startGameProcess(win));
+		bindMenu(menu, stopGame = new JMenuItem("Stop Game"), KeyStroke.getKeyStroke(VK_F11, 0),
+				e -> Main.stopGameProcess(win));
+		stopGame.setEnabled(false);
 		return menu;
 	}
 
@@ -110,6 +121,12 @@ public class MenuBar extends JMenuBar {
 		return menu;
 	}
 
+	private JMenu initHelpMenu(JMenu menu) {
+		bindMenu(menu, new JMenuItem("Help"), KeyStroke.getKeyStroke(VK_H, KeyEvent.CTRL_MASK),
+				e -> System.out.println("Help"));// TODO add Manual
+		return menu;
+	}
+
 	private JMenuItem bindMenu(JMenu menu, JMenuItem item, KeyStroke accelator, ActionListener listener) {
 		menu.add(item);
 		if (listener != null)
@@ -123,6 +140,15 @@ public class MenuBar extends JMenuBar {
 		edit.setEnabled(activate);
 		mode.setEnabled(activate);
 		layer.setEnabled(activate);
+		activateGameStart(activate);
+	}
+
+	public void activateGameStart(boolean activate) {
+		if (win.tools != null)
+			win.tools.getB_start_game().setSelected(!activate);
+		startGame.setEnabled(activate);
+		stopGame.setEnabled(!activate);
+
 	}
 
 }

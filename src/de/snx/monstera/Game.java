@@ -32,7 +32,12 @@ public class Game {
 
 	public Game() {
 		preInit();
-		init();
+		init(null);
+	}
+
+	public Game(String projectPath, String projectName) {
+		preInit();
+		init(new String[] { projectPath, projectName });
 	}
 
 	/**
@@ -123,10 +128,13 @@ public class Game {
 
 	/**
 	 * Load and start game
+	 * 
+	 * @param projectArgs the project path and name, if the user starts this game
+	 *                    from the creator, otherwise null
 	 */
-	private void init() {
+	private void init(String[] projectArgs) {
 		window.setVisible();
-		if (!ProjectHandler.loadProject(window.getFrame())) {
+		if (!ProjectHandler.loadProject(window.getFrame(), projectArgs)) {
 			JOptionPane.showMessageDialog(window, "Error loading data!");
 			System.exit(-1);
 		}
