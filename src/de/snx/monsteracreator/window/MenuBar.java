@@ -3,26 +3,27 @@ package de.snx.monsteracreator.window;
 import static java.awt.event.InputEvent.*;
 import static java.awt.event.KeyEvent.*;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import de.snx.monstera.Main;
 import de.snx.monstera.data.ProjectHandler;
+import lombok.Getter;
 
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
 
 	private Window win;
 
-	private JMenu edit, mode, layer;
+	private JMenu edit, game, mapView;
 	private JMenuItem startGame, stopGame;
+	@Getter
+	private JCheckBox halfFPSMode;
 
 	public MenuBar(Window win) {
 		this.win = win;
@@ -32,8 +33,8 @@ public class MenuBar extends JMenuBar {
 	private void initMenus() {
 		add(initFileMenu(new JMenu("File")));
 		add(initEditMenu(edit = new JMenu("Edit")));
-		add(initModeMenu(mode = new JMenu("Mode")));
-		add(initLayerMenu(layer = new JMenu("Layer")));
+		add(initGameMenu(game = new JMenu("Game")));
+		add(initMapViewMenu(mapView = new JMenu("MapView")));
 		add(initHelpMenu(new JMenu("Help")));
 		activateAll(false);
 	}
@@ -70,12 +71,29 @@ public class MenuBar extends JMenuBar {
 				e -> new EditMonster(win));
 		bindMenu(menu, new JMenuItem("Edit Groups"), KeyStroke.getKeyStroke(VK_G, ALT_MASK),
 				e -> new EditGroupsWin(win));
-		menu.add(new JSeparator());
+		return menu;
+	}
+
+	private JMenu initGameMenu(JMenu menu) {
+		bindMenu(menu, new JMenuItem("Set Game Scale"), null, e -> new ScaleWindow(win));
 		bindMenu(menu, startGame = new JMenuItem("Start Game"), KeyStroke.getKeyStroke(VK_F11, 0),
 				e -> Main.startGameProcess(win));
 		bindMenu(menu, stopGame = new JMenuItem("Stop Game"), KeyStroke.getKeyStroke(VK_F11, 0),
 				e -> Main.stopGameProcess(win));
 		stopGame.setEnabled(false);
+		menu.add(halfFPSMode = new JCheckBox("Use Half-FPS-Mode"));
+		halfFPSMode.setToolTipText(
+				"Runs the game at half fps to increase performance. (The ticks are duplicated to simulate 60 ticks)");
+		halfFPSMode.addActionListener(e -> {
+			ProjectHandler.getProject().setUseHalfFPSMode(halfFPSMode.isSelected());
+			System.out.println(halfFPSMode.isSelected());
+		});
+		return menu;
+	}
+
+	private JMenu initMapViewMenu(JMenu menu) {
+		menu.add(initModeMenu(new JMenu("Mode")));
+		menu.add(initLayerMenu(new JMenu("Layer")));
 		return menu;
 	}
 
@@ -138,8 +156,8 @@ public class MenuBar extends JMenuBar {
 
 	public void activateAll(boolean activate) {
 		edit.setEnabled(activate);
-		mode.setEnabled(activate);
-		layer.setEnabled(activate);
+		game.setEnabled(activate);
+		mapView.setEnabled(activate);
 		activateGameStart(activate);
 	}
 
@@ -148,6 +166,34 @@ public class MenuBar extends JMenuBar {
 			win.tools.getB_start_game().setSelected(!activate);
 		startGame.setEnabled(activate);
 		stopGame.setEnabled(!activate);
+
+	}
+
+	private class ScaleWindow extends JDialog {
+
+		public ScaleWindow(Window win) {
+			super(win, "Set Game Scale", ModalityType.APPLICATION_MODAL);
+			setLayout(new BorderLayout());
+			JSpinner scale = new JSpinner(new SpinnerNumberModel(ProjectHandler.getProject().getScale(), .5, 100, .25));
+			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+			add(new JLabel("New Scale:"), BorderLayout.NORTH);
+			add(scale, BorderLayout.CENTER);
+			add(buttons, BorderLayout.SOUTH);
+			JButton apply, cancel;
+			apply = new JButton("Apply");
+			apply.addActionListener(a -> {
+				ProjectHandler.getProject().setScale((double) scale.getValue());
+				dispose();
+			});
+			cancel = new JButton("Cancel");
+			cancel.addActionListener(a -> dispose());
+			buttons.add(apply);
+			buttons.add(cancel);
+			setResizable(false);
+			pack();
+			setLocationRelativeTo(win);
+			setVisible(true);
+		}
 
 	}
 

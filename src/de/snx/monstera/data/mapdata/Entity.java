@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.snx.monstera.Game;
 import de.snx.monstera.data.IValueID;
+import de.snx.monstera.data.Project;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.event.Event;
 import de.snx.monstera.global_data.EventRegistry;
@@ -129,11 +130,13 @@ public class Entity implements IValueID {
 	public void render(Graphics2D g, int offsetX, int offsetY) {
 		if (invisible)
 			return;
-		int ts = ProjectHandler.getProject().getTilesize();
+		Project project = ProjectHandler.getProject();
+		double scale = project.getScale();
+		double ts = project.getTilesize() * scale;
 		BufferedImage img = ProjectHandler.getEntityImages().getImage(imgRes).getImage(direction, anim);
-		int x = (int) (this.x * ts) + ts / 2 - img.getWidth() / 2 - offsetX;
-		int y = (int) (this.y * ts) + ts - img.getHeight() - offsetY;
-		g.drawImage(img, x, y, null);
+		int x = (int) (this.x * ts + ts / 2 - img.getWidth() * scale / 2 - offsetX);
+		int y = (int) (this.y * ts + ts - img.getHeight() * scale - offsetY);
+		g.drawImage(img, x, y, (int) (img.getWidth() * scale), (int) (img.getHeight() * scale), null);
 	}
 
 	public void setPos(double x, double y) {

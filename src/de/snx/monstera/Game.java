@@ -3,7 +3,9 @@ package de.snx.monstera;
 import java.awt.Dimension;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -13,6 +15,7 @@ import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.IntroState;
 import de.snx.monstera.state.MenuState;
 import de.snx.monstera.state.WorldState;
+import lombok.Setter;
 
 /**
  * Prepares everything for the game and starts the GameWindow. All resources
@@ -30,14 +33,21 @@ public class Game {
 	private GameStateManager gsm;
 	private Looper looper;
 
-	public Game() {
-		preInit();
-		init(null);
-	}
+	@Setter
+	private boolean lowFPSMode; // halves the ticks per second and runs updates twice to gain the same effect of
+								// the normal game (for low performance)
 
-	public Game(String projectPath, String projectName) {
+	public Game(String[] args0) {
+		List<String> args = Arrays.asList(args0);
+		String[] projectData = null;
+		if (args.contains("low_fps"))
+			lowFPSMode = true;
+		int index = args.indexOf("start from creator");
+		if (index >= 0 && args.size() - 1 >= index + 2) {
+			projectData = new String[] { args.get(index + 1), args.get(index + 2) };
+		}
 		preInit();
-		init(new String[] { projectPath, projectName });
+		init(projectData);
 	}
 
 	/**
@@ -140,7 +150,7 @@ public class Game {
 		}
 		window.getFrame().setTitle(ProjectHandler.getProject().getName());
 		gsm.registerStates(0, new IntroState(0), new MenuState(1), new WorldState(2), new BattleState(3));
-		looper = new Looper(TICKS, i -> {
+		looper = new Looper(lowFPSMode ? TICKS / 2 : TICKS, i -> {
 			update(i);
 			render(i);
 		});
@@ -149,6 +159,8 @@ public class Game {
 
 	private void update(int ticks) {
 		gsm.update(ticks);
+		if (lowFPSMode)
+			gsm.update(ticks);
 	}
 
 	private void render(int fps) {

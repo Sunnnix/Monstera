@@ -42,7 +42,9 @@ public class Window extends Canvas {
 				game.exit();
 			}
 		});
-		frame.addKeyListener(new KListener());
+		setFocusable(true);
+		requestFocus();
+		addKeyListener(new KListener());
 	}
 
 	public void setVisible() {

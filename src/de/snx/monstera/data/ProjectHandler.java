@@ -57,6 +57,7 @@ public class ProjectHandler {
 		maps = new Maps();
 		saveProject(window, false);
 		window.menu.activateAll(true);
+		window.menu.getHalfFPSMode().setSelected(project.isUseHalfFPSMode());
 		window.loadAll();
 		window.repaint();
 	}
@@ -85,7 +86,9 @@ public class ProjectHandler {
 		Config.projectsPath = mGame.getParent();
 		try (PSFFileIO file = new PSFFileIO(mGame, "w")) {
 			file.write("tilesize", project.getTilesize());
+			file.write("scale", project.getScale());
 			file.write("name", project.getName());
+			file.write("low-fps", project.isUseHalfFPSMode());
 			ResourceHandler.saveResources(project);
 			maps.save(project);
 			file.room("player", _s -> {
@@ -132,6 +135,8 @@ public class ProjectHandler {
 					name = proName;
 			}
 			project = new Project(tilesize, name, chooser.getSelectedFile().getParentFile());
+			project.setScale(file.readDouble("scale", 1));
+			project.setUseHalfFPSMode(file.readBoolean("low-fps", false));
 			setUpResources();
 			maps = new Maps();
 			maps.load(project);
@@ -142,6 +147,7 @@ public class ProjectHandler {
 			entityImages.load(project);
 			ResourceHandler.loadResources(project);
 			window.menu.activateAll(true);
+			window.menu.getHalfFPSMode().setSelected(project.isUseHalfFPSMode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -182,6 +188,8 @@ public class ProjectHandler {
 			int tilesize = file.readInt("tilesize", 24);
 			String name = file.readString("name");
 			project = new Project(tilesize, name, projectFile.getParentFile());
+			project.setScale(file.readDouble("scale", 1));
+			project.setUseHalfFPSMode(file.readBoolean("low-fps", false));
 			setUpResources();
 			maps = new Maps();
 			maps.load(project);
@@ -206,7 +214,7 @@ public class ProjectHandler {
 		ResourceHandler.addResource(tilesets = new Tilesets());
 	}
 
-	public static boolean isInited() {
+	public static boolean isProjectLoaded() {
 		return project != null;
 	}
 

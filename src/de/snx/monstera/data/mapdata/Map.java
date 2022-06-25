@@ -169,6 +169,9 @@ public class Map extends IDSorted<Entity> implements IResource, IValueID {
 					tiles[x][y] = new Tile(x, y);
 	}
 
+	/**
+	 * Paint from creator
+	 */
 	public void paint(Graphics g, MapViewPanel mapView, Window win) {
 		int ts = ProjectHandler.getProject().getTilesize();
 		for (int x = 0; x < width; x++)
@@ -252,7 +255,10 @@ public class Map extends IDSorted<Entity> implements IResource, IValueID {
 	}
 
 	public Tile getTile(int x, int y) {
-		return tiles[x][y];
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return null;
+		else
+			return tiles[x][y];
 	}
 
 	public Entity getEntityFromPos(int x, int y) {
@@ -288,8 +294,12 @@ public class Map extends IDSorted<Entity> implements IResource, IValueID {
 		values.forEach((k, e) -> e.update(world, this));
 	}
 
+	/**
+	 * Render for Game
+	 */
 	public void render(WorldState state, GameStateManager gsm, Graphics2D g) {
-		int ts = ProjectHandler.getProject().getTilesize();
+		Project project = ProjectHandler.getProject();
+		int ts = (int) (project.getTilesize() * project.getScale());
 		int cX = state.getCameraX(), cY = state.getCameraY();
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)

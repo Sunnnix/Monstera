@@ -1,10 +1,12 @@
 package de.snx.monstera.state;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
 import de.snx.monstera.Game;
+import de.snx.monstera.data.Project;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.mapdata.Entity;
 import de.snx.monstera.data.mapdata.Map;
@@ -25,6 +27,7 @@ public class WorldState extends GameState {
 
 	public WorldState(int id) {
 		super(id);
+		setBackgroundColor(Color.BLACK);
 		camera = new Rectangle(0, 0, Game.DEFAULT_SIZE.width, Game.DEFAULT_SIZE.height);
 	}
 
@@ -64,13 +67,13 @@ public class WorldState extends GameState {
 
 	@Override
 	protected void update(GameStateManager gsm, int ticks) {
-		setCameraPos();
 		if (runningEvent != null) {
 			runningEvent.update(ProjectHandler.getMaps().getSelected(), this, gsm);
 			if (runningEvent.isFinished())
 				runningEvent = runningEvent.getCaller().getEvent();
 		} else
 			ProjectHandler.getMaps().update(this, gsm);
+		setCameraPos();
 	}
 
 	@Override
@@ -112,10 +115,11 @@ public class WorldState extends GameState {
 	}
 
 	private void setCameraPos() {
-		int tilesize = ProjectHandler.getProject().getTilesize();
+		Project project = ProjectHandler.getProject();
+		double tilesize = project.getTilesize() * project.getScale();
 		Entity player = ProjectHandler.getMaps().getPlayer();
-		int x = (int) (tilesize / 2 + player.getX() * tilesize - camera.getWidth() / 2);
-		int y = (int) (tilesize / 2 + player.getY() * tilesize - camera.getHeight() / 2);
+		int x = (int) Math.floor(tilesize / 2 + player.getX() * tilesize - camera.getWidth() / 2);
+		int y = (int) Math.floor(tilesize / 2 + player.getY() * tilesize - camera.getHeight() / 2);
 		camera.setLocation(x, y);
 	}
 

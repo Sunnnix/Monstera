@@ -34,12 +34,8 @@ public class EntityImage {
 				img[i] = tmp;
 		} else
 			try {
-				src = file.getName().substring(0, file.getName().length() - 3);
-				BufferedImage root = ImageIO.read(file);
-				BufferedImage src = new BufferedImage((int) (root.getWidth() * 2), (int) (root.getHeight() * 2),
-						BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = src.createGraphics();
-				g.drawImage(root, 0, 0, src.getWidth(), src.getHeight(), null);
+				src = file.getName().substring(0, file.getName().length() - 4);
+				BufferedImage src = ImageIO.read(file);
 				img = new BufferedImage[4 * 3];
 				int xPart, yPart;
 				xPart = src.getWidth() / 4;

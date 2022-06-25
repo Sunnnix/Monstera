@@ -2,6 +2,7 @@ package de.snx.monstera.data.mapdata;
 
 import java.awt.Graphics2D;
 
+import de.snx.monstera.data.Project;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.Tilesets;
 
@@ -19,14 +20,16 @@ public class Tile {
 
 	public void renderL1(Graphics2D g, int x, int y, double offsetX, double offsetY) {
 		Tilesets tilesets = ProjectHandler.getTilesets();
-		int ts = ProjectHandler.getProject().getTilesize();
+		Project project = ProjectHandler.getProject();
+		int ts = (int) (project.getTilesize() * project.getScale());
 		int animTimer = ProjectHandler.getMaps().getAnimTImer();
 		g.drawImage(tilesets.get(l1, animTimer), (int) (x - offsetX), (int) (y - offsetY), ts, ts, null);
 		g.drawImage(tilesets.get(l2, animTimer), (int) (x - offsetX), (int) (y - offsetY), ts, ts, null);
 	}
 
 	public void renderL2(Graphics2D g, int x, int y, double offsetX, double offsetY) {
-		int ts = ProjectHandler.getProject().getTilesize();
+		Project project = ProjectHandler.getProject();
+		int ts = (int) (project.getTilesize() * project.getScale());
 		g.drawImage(ProjectHandler.getTilesets().get(l3, ProjectHandler.getMaps().getAnimTImer()), (int) (x - offsetX),
 				(int) (y - offsetY), ts, ts, null);
 	}

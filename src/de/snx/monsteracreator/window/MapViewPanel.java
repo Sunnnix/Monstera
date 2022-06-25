@@ -69,7 +69,7 @@ public class MapViewPanel extends JPanel {
 	public void paint(Graphics g) {
 		setBackground(Config.getEditorColor(Config.C_MAP_VIEW_BACKGROUND));
 		super.paint(g);
-		if (!ProjectHandler.isInited())
+		if (!ProjectHandler.isProjectLoaded())
 			return;
 		Map map = ProjectHandler.getMaps().getSelected();
 		if (map == null)
@@ -255,6 +255,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if (!ProjectHandler.isProjectLoaded())
+				return;
 			Map map = ProjectHandler.getMaps().getSelected();
 			if (map == null)
 				return;
@@ -353,6 +355,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			if (!ProjectHandler.isProjectLoaded())
+				return;
 			Map map = ProjectHandler.getMaps().getSelected();
 			if (map == null)
 				return;
@@ -369,6 +373,8 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if (!ProjectHandler.isProjectLoaded())
+				return;
 			Map map = ProjectHandler.getMaps().getSelected();
 			if (map == null)
 				return;
@@ -437,7 +443,7 @@ public class MapViewPanel extends JPanel {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			if (!ProjectHandler.isInited())
+			if (!ProjectHandler.isProjectLoaded())
 				return;
 			int tilesize = ProjectHandler.getProject().getTilesize();
 			win.info.setPos(e.getX() / tilesize, e.getY() / tilesize);
@@ -448,6 +454,8 @@ public class MapViewPanel extends JPanel {
 	private class KeyListener extends KeyAdapter {
 
 		public void keyPressed(KeyEvent k) {
+			if (!ProjectHandler.isProjectLoaded())
+				return;
 			Map map = ProjectHandler.getMaps().getSelected();
 			if (map == null)
 				return;
@@ -464,6 +472,8 @@ public class MapViewPanel extends JPanel {
 	private class EntityPopUp extends JPopupMenu {
 
 		public EntityPopUp(Entity e, int x, int y) {
+			if (!ProjectHandler.isProjectLoaded())
+				return;
 			Map map = ProjectHandler.getMaps().getSelected();
 			if (e != null) {
 				add(new JLabel(e.toString()));

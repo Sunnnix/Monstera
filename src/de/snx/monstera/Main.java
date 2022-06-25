@@ -3,6 +3,7 @@ package de.snx.monstera;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -28,12 +29,8 @@ public class Main {
 		registerAll();
 		if (args.length > 0 && args[0].equals("creator"))
 			new Creator();
-		else {
-			if (args.length > 2 && args[0].equals("start from creator"))
-				new Game(args[1], args[2]);
-			else
-				new Game();
-		}
+		else
+			new Game(args);
 	}
 
 	/**
@@ -67,8 +64,16 @@ public class Main {
 				return;
 			}
 			window.menu.activateGameStart(false);
-			Process process = new ProcessBuilder("java", "-jar", jar, "start from creator",
-					project.getDirectory().getAbsolutePath(), project.getName()).start();
+			ArrayList<String> commands = new ArrayList<>();
+			commands.add("java");
+			commands.add("-jar");
+			commands.add(jar);
+			commands.add("start from creator");
+			commands.add(project.getDirectory().getAbsolutePath());
+			commands.add(project.getName());
+			if (project.isUseHalfFPSMode())
+				commands.add("low_fps");
+			Process process = new ProcessBuilder(commands.toArray(new String[0])).start();
 			gameProcess = process;
 			new Thread(() -> {
 				while (process.isAlive()) {

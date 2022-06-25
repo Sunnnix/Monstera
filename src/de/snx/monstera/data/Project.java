@@ -3,6 +3,7 @@ package de.snx.monstera.data;
 import java.io.File;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class Project {
 
@@ -12,6 +13,12 @@ public class Project {
 	private File directory;
 	@Getter
 	private final int tilesize;
+	@Getter
+	@Setter
+	private double scale = 1;
+	@Getter
+	@Setter
+	private boolean useHalfFPSMode;
 
 	public Project(int tilesize, String name, File directory) {
 		this.tilesize = tilesize;
@@ -22,6 +29,7 @@ public class Project {
 	public void changeName(String name) {
 		if (name == null || name.isEmpty())
 			return;
+		this.name = name;
 	}
 
 	public String getResourcePath() {

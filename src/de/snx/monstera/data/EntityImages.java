@@ -27,7 +27,6 @@ public class EntityImages {
 			}
 		} else
 			directory.mkdirs();
-
 	}
 
 	public EntityImage getImage(String src) {
