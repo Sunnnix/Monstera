@@ -284,8 +284,8 @@ public class Map extends IDSorted<Entity> implements IResource, IValueID {
 		for (int i : ids) {
 			if (i == id)
 				id++;
-			else
-				return i;
+			else if (i > id)
+				return id;
 		}
 		return id;
 	}

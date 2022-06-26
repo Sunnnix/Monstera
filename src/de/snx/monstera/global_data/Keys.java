@@ -18,6 +18,7 @@ public class Keys {
 
 	// UTIL
 	public static final Key DEBUG = new Key(KeyEvent.VK_F3);
+	public static final Key WTW = new Key(KeyEvent.VK_CONTROL);
 
 	// MOVEMENT
 	public static final Key UP = new Key(KeyEvent.VK_W, KeyEvent.VK_UP);

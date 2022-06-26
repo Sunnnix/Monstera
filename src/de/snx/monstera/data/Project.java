@@ -18,7 +18,7 @@ public class Project {
 	private double scale = 1;
 	@Getter
 	@Setter
-	private boolean useHalfFPSMode;
+	private boolean useHalfFPSMode, fromCreator;
 
 	public Project(int tilesize, String name, File directory) {
 		this.tilesize = tilesize;

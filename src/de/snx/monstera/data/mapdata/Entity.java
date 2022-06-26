@@ -11,6 +11,7 @@ import de.snx.monstera.data.Project;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.event.Event;
 import de.snx.monstera.global_data.EventRegistry;
+import de.snx.monstera.global_data.Keys;
 import de.snx.monstera.state.WorldState;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -67,6 +68,7 @@ public class Entity implements IValueID {
 		this.x = file.readDouble("x");
 		this.y = file.readDouble("y");
 		this.invisible = file.readBoolean("invisible");
+		this.imgRes = file.readString("img_res", "");
 		this.eventTrigger = file.readInt("trigger");
 		file.room("events", s -> {
 			int size = file.readInt("size");
@@ -87,6 +89,7 @@ public class Entity implements IValueID {
 		file.write("x", x);
 		file.write("y", y);
 		file.write("invisible", invisible);
+		file.write("img_res", imgRes);
 		file.write("trigger", eventTrigger);
 		file.room("events", s -> {
 			file.write("size", events.size());
@@ -171,7 +174,8 @@ public class Entity implements IValueID {
 		default:
 			return;
 		}
-		isMoving = tile != null && !tile.isBlocking;
+		isMoving = ProjectHandler.getProject().isFromCreator() && Keys.WTW.isHold() ? true
+				: tile != null && !tile.isBlocking;
 	}
 
 	private void move(WorldState world, Map map) {

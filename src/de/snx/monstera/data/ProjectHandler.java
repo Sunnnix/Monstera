@@ -190,6 +190,8 @@ public class ProjectHandler {
 			project = new Project(tilesize, name, projectFile.getParentFile());
 			project.setScale(file.readDouble("scale", 1));
 			project.setUseHalfFPSMode(file.readBoolean("low-fps", false));
+			if(projectArgs != null)
+				project.setFromCreator(true);
 			setUpResources();
 			maps = new Maps();
 			maps.load(project);

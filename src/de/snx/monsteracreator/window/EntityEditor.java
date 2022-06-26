@@ -6,10 +6,14 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Collections;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 
+import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.mapdata.Entity;
 import de.snx.monstera.event.Event;
 
@@ -64,8 +68,48 @@ public class EntityEditor extends JDialog {
 		panel.add(createRow("Y:", f_y = new JTextField(Integer.toString((int) entity.getY()))));
 		panel.add(createRow("Invisible:", cb_invisible = new JCheckBox()));
 		cb_invisible.setSelected(entity.isInvisible());
-		panel.add(createRow("Image:", f_image = new JTextField(entity.getImageName())));
+		JPanel imagePanel = new JPanel(new BorderLayout());
+		imagePanel.add(f_image = new JTextField(entity.getImageName()), BorderLayout.WEST);
+		JButton deleteImageB;
+		try {
+			deleteImageB = new JButton(new ImageIcon(
+					ImageIO.read(getClass().getResource("/de/snx/monstera/graphic/creator/icon_trash.png"))));
+		} catch (Exception e) {
+			deleteImageB = new JButton("X");
+		}
+		deleteImageB.setPreferredSize(new Dimension(20, 20));
+		deleteImageB.addActionListener(e -> f_image.setText(""));
+		imagePanel.add(deleteImageB, BorderLayout.EAST);
+		panel.add(createRow("Image:", imagePanel));
 		f_image.setEditable(false);
+		f_image.setPreferredSize(new Dimension(155, 20));
+		f_image.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1) {
+					JFileChooser chooser = new JFileChooser(
+							new File(ProjectHandler.getProject().getResourcePath() + "graphic/entity"));
+					chooser.setFileFilter(new FileFilter() {
+
+						@Override
+						public String getDescription() {
+							return "Image (.png)";
+						}
+
+						@Override
+						public boolean accept(File f) {
+							return f.getName().toLowerCase().endsWith(".png");
+						}
+					});
+					chooser.showOpenDialog(EntityEditor.this);
+					File file = chooser.getSelectedFile();
+					if (file == null)
+						return;
+					f_image.setText(file.getName().substring(0, file.getName().length() - 4));
+				}
+			}
+		});
 		panel.add(createRow("Trigger:", trigger = new JComboBox<>(new String[] { "None", "Interact", "On Touch" })));
 		int te = entity.getEventTrigger();
 		trigger.setSelectedIndex(te < 0 ? 1 : te);
@@ -106,6 +150,7 @@ public class EntityEditor extends JDialog {
 		entity.setInvisible(cb_invisible.isSelected());
 		entity.setEventTrigger(trigger.getSelectedIndex());
 		entity.setEvents(Collections.list(listModel.elements()));
+		entity.setImageResource(f_image.getText());
 		if (close)
 			dispose();
 	}
