@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -24,6 +27,8 @@ public class Config {
 	public static Rectangle windowBounds = new Rectangle();
 	public static String projectsPath = ""; // The latest opened file path
 	private static Color[] editorColors;
+	public static ArrayList<String> recentProjects = new ArrayList<>();
+
 	public static final int C_MAP_VIEW_BACKGROUND = 0;
 	public static final int C_TILESET_BACKGROUND = 1;
 	public static final int C_MAP_VIEW_GRID = 2;
@@ -66,6 +71,7 @@ public class Config {
 				loadWindowSettings(json);
 				loadPaths(json);
 				loadColors(json);
+				loadRecentProjects(json);
 			} else {
 				configFile.createNewFile();
 				save();
@@ -83,6 +89,7 @@ public class Config {
 		saveWindowSettings(json);
 		savePaths(json);
 		saveColors(json);
+		saveRecentProjects(json);
 		try (FileWriter writer = new FileWriter(new File("creator.config"))) {
 			writer.write(json.toString());
 		} catch (Exception e) {
@@ -151,6 +158,31 @@ public class Config {
 	public static void setEditorColor(int id, Color color) {
 		if (id >= 0 || id < editorColors.length)
 			editorColors[id] = color;
+	}
+
+	private static void loadRecentProjects(JSONObject json) {
+		try {
+			JSONArray arr = json.getJSONArray("recent_projects");
+			recentProjects.clear();
+			for (int i = 0; i < arr.length(); i++)
+				recentProjects.add(arr.getString(i));
+		} catch (JSONException e) {
+			System.err.println("Config missing recent_projects");
+		}
+	}
+
+	private static void saveRecentProjects(JSONObject json) {
+		JSONArray arr = new JSONArray(recentProjects);
+		json.put("recent_projects", arr);
+	}
+
+	public static void addRecentProject(String path) {
+		int containI = recentProjects.indexOf(path);
+		if (containI != -1)
+			recentProjects.remove(containI);
+		recentProjects.add(0, path);
+		if (recentProjects.size() > 10)
+			recentProjects.remove(10);
 	}
 
 }

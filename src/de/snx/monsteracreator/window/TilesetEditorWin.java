@@ -55,10 +55,6 @@ public class TilesetEditorWin extends JDialog {
 		JPanel propertie = new JPanel(new GridLayout(0, 1));
 		propertie.add(createRow("Tooltip", tooltip = new JTextField()));
 		propertie.add(createRow("Animated Tiles:", cb_animate = new JCheckBox()));
-		cb_animate.addActionListener(a -> {
-			if (selectedProp != null)
-				selectedProp.animate = cb_animate.isSelected();
-		});
 		propertie.add(createRow("Animation Timer:", animTimer = new JSpinner(new SpinnerNumberModel(15, 1, 120, 1))));
 		propertie.add(createRow("Image Source:", tf_src = new JTextField()));
 		tf_src.addMouseListener(new MouseAdapter() {
@@ -77,8 +73,7 @@ public class TilesetEditorWin extends JDialog {
 			if (selected[0] == -1)
 				return;
 			if (selectedProp == null) {
-				tilesets.getProperties().setPropertie(selected, new Propertie());
-				loadPropertie();
+				selectedProp = new Propertie();
 			} else {
 				tilesets.getProperties().removePropertie(selected);
 				loadPropertie();
@@ -96,6 +91,7 @@ public class TilesetEditorWin extends JDialog {
 			selectedProp.src = tf_src.getText();
 			if (selectedProp.animate)
 				selectedProp.loadAnimImage();
+			tilesets.getProperties().setPropertie(selected, selectedProp);
 		});
 		tmp.add(buttons, BorderLayout.SOUTH);
 		add(tmp, BorderLayout.WEST);

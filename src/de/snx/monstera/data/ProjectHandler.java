@@ -105,28 +105,33 @@ public class ProjectHandler {
 	/**
 	 * For Creator
 	 */
-	public static void loadProject(Window window) {
-		JFileChooser chooser = new JFileChooser(Config.projectsPath);
-		chooser.setFileFilter(new FileFilter() {
+	public static void loadProject(Window window, String path) {
+		File projectFile;
+		if (path == null) {
+			JFileChooser chooser = new JFileChooser(Config.projectsPath);
+			chooser.setFileFilter(new FileFilter() {
 
-			@Override
-			public String getDescription() {
-				return "Monstera Game (.mgame)";
-			}
+				@Override
+				public String getDescription() {
+					return "Monstera Game (.mgame)";
+				}
 
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().endsWith(".mgame");
-			}
-		});
-		if (chooser.showOpenDialog(window) != JFileChooser.APPROVE_OPTION)
-			return;
-		Config.projectsPath = chooser.getSelectedFile().getParent();
-		try (PSFFileIO file = new PSFFileIO(chooser.getSelectedFile(), "r")) {
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory() || f.getName().endsWith(".mgame");
+				}
+			});
+			if (chooser.showOpenDialog(window) != JFileChooser.APPROVE_OPTION)
+				return;
+			projectFile = chooser.getSelectedFile();
+		} else
+			projectFile = new File(path);
+		Config.projectsPath = projectFile.getParent();
+		try (PSFFileIO file = new PSFFileIO(projectFile, "r")) {
 			int tilesize = file.readInt("tilesize", 24);
 			String name = file.readString("name", null);
 			if (name == null) {
-				String fName = chooser.getSelectedFile().getName();
+				String fName = project.getName();
 				String proName = fName.substring(0, fName.lastIndexOf(".mgame"));
 				name = JOptionPane.showInputDialog(window,
 						"Looks like you are using the old Project format.\nWould you tell me the project name?",
@@ -134,7 +139,7 @@ public class ProjectHandler {
 				if (name == null)
 					name = proName;
 			}
-			project = new Project(tilesize, name, chooser.getSelectedFile().getParentFile());
+			project = new Project(tilesize, name, projectFile.getParentFile());
 			project.setScale(file.readDouble("scale", 1));
 			project.setUseHalfFPSMode(file.readBoolean("low-fps", false));
 			setUpResources();
@@ -148,11 +153,16 @@ public class ProjectHandler {
 			ResourceHandler.loadResources(project);
 			window.menu.activateAll(true);
 			window.menu.getHalfFPSMode().setSelected(project.isUseHalfFPSMode());
+			Config.addRecentProject(projectFile.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		window.loadAll();
 		window.repaint();
+	}
+
+	public static void loadProject(Window window) {
+		loadProject(window, (String) null);
 	}
 
 	/**
@@ -190,7 +200,7 @@ public class ProjectHandler {
 			project = new Project(tilesize, name, projectFile.getParentFile());
 			project.setScale(file.readDouble("scale", 1));
 			project.setUseHalfFPSMode(file.readBoolean("low-fps", false));
-			if(projectArgs != null)
+			if (projectArgs != null)
 				project.setFromCreator(true);
 			setUpResources();
 			maps = new Maps();

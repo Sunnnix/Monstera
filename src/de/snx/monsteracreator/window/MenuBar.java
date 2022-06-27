@@ -13,6 +13,7 @@ import javax.swing.*;
 
 import de.snx.monstera.Main;
 import de.snx.monstera.data.ProjectHandler;
+import de.snx.monsteracreator.Config;
 import lombok.Getter;
 
 @SuppressWarnings("serial")
@@ -42,6 +43,7 @@ public class MenuBar extends JMenuBar {
 	private JMenu initFileMenu(JMenu menu) {
 		bindMenu(menu, new JMenuItem("New Project"), null, e -> ProjectHandler.newProject(win));
 		bindMenu(menu, new JMenuItem("Open Project"), null, e -> ProjectHandler.loadProject(win));
+		bindMenu(menu, initOpenRecentMenu(new JMenu("Open Recent Project")), null, null);
 		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Save Project"), KeyStroke.getKeyStroke(VK_S, CTRL_MASK),
 				e -> ProjectHandler.saveProject(win, false));
@@ -51,6 +53,17 @@ public class MenuBar extends JMenuBar {
 		bindMenu(menu, new JMenuItem("Customize Editor"), null, e -> new CustomizerWin(win));
 		menu.add(new JSeparator());
 		bindMenu(menu, new JMenuItem("Exit"), null, e -> System.exit(0));
+		return menu;
+	}
+
+	private JMenu initOpenRecentMenu(JMenu menu) {
+		if (Config.recentProjects.size() == 0)
+			bindMenu(menu, new JMenuItem("Nothing here"), null, null);
+		else {
+			Config.recentProjects.forEach(path -> {
+				bindMenu(menu, new JMenuItem(path), null, e -> ProjectHandler.loadProject(win, path));
+			});
+		}
 		return menu;
 	}
 
