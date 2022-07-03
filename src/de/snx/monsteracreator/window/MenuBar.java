@@ -14,6 +14,7 @@ import javax.swing.*;
 import de.snx.monstera.Main;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monsteracreator.Config;
+import de.snx.monsteracreator.MemoryStacks;
 import lombok.Getter;
 
 @SuppressWarnings("serial")
@@ -22,6 +23,7 @@ public class MenuBar extends JMenuBar {
 	private Window win;
 
 	private JMenu edit, game, mapView;
+	private JMenuItem undo, redo;
 	private JMenuItem startGame, stopGame;
 	@Getter
 	private JCheckBox halfFPSMode;
@@ -68,6 +70,18 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private JMenu initEditMenu(JMenu menu) {
+		bindMenu(menu, undo = new JMenuItem("Undo"), KeyStroke.getKeyStroke(VK_Z, CTRL_MASK), e -> {
+			MemoryStacks.loadUndoStack();
+			checkUndoRedo();
+			win.repaint();
+		});
+		undo.setEnabled(false);
+		bindMenu(menu, redo = new JMenuItem("Redo"), KeyStroke.getKeyStroke(VK_Y, CTRL_MASK), e -> {
+			MemoryStacks.loadRedoStack();
+			checkUndoRedo();
+			win.repaint();
+		});
+		redo.setEnabled(false);
 		bindMenu(menu, new JMenuItem("New Map"), KeyStroke.getKeyStroke(VK_N, CTRL_MASK),
 				e -> ProjectHandler.getMaps().newMapDialog(win));
 		bindMenu(menu, new JMenuItem("Switch Map"), KeyStroke.getKeyStroke(VK_O, CTRL_MASK),
@@ -180,6 +194,13 @@ public class MenuBar extends JMenuBar {
 		startGame.setEnabled(activate);
 		stopGame.setEnabled(!activate);
 
+	}
+
+	public void checkUndoRedo() {
+		undo.setEnabled(MemoryStacks.hasUndo());
+		redo.setEnabled(MemoryStacks.hasRedo());
+		win.tools.getB_undo().setEnabled(MemoryStacks.hasUndo());
+		win.tools.getB_redo().setEnabled(MemoryStacks.hasRedo());
 	}
 
 	private class ScaleWindow extends JDialog {

@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import de.snx.monsteracreator.Config;
+import de.snx.monsteracreator.MemoryStacks;
 import de.snx.monsteracreator.window.Window;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -60,6 +61,7 @@ public class ProjectHandler {
 		window.menu.getHalfFPSMode().setSelected(project.isUseHalfFPSMode());
 		window.loadAll();
 		window.repaint();
+		MemoryStacks.clearStacks();
 	}
 
 	public static void saveProject(Window window, boolean chooseFile) {
@@ -157,6 +159,8 @@ public class ProjectHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		MemoryStacks.clearStacks();
+		window.menu.checkUndoRedo();
 		window.loadAll();
 		window.repaint();
 	}

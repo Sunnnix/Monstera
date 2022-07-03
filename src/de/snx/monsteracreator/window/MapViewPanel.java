@@ -364,10 +364,12 @@ public class MapViewPanel extends JPanel {
 				if (pressed == 1)
 					pressed = 0;
 				setFromPrev();
+				win.onAction();
 			} else if (e.getButton() == MouseEvent.BUTTON3) {
 				if (pressed == 2)
 					pressed = 0;
 				setFromPrev();
+				win.onAction();
 			}
 		}
 

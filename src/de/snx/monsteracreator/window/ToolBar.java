@@ -1,5 +1,7 @@
 package de.snx.monsteracreator.window;
 
+import static de.snx.monstera.util.WindowUtils.*;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -7,9 +9,9 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
-import javax.swing.JSeparator;
 
 import de.snx.monstera.Main;
+import de.snx.monsteracreator.MemoryStacks;
 import de.snx.monsteracreator.window.MapViewPanel.Mode;
 import de.snx.monsteracreator.window.MapViewPanel.Shape;
 import lombok.Getter;
@@ -24,6 +26,9 @@ public class ToolBar extends JMenuBar {
 
 	private Window win;
 
+	@Getter
+	private JButton b_undo, b_redo;
+
 	private JButton b_draw, b_blocking, b_entity, b_layer, b_single_tile, b_rect_tile, b_circle_tile, b_fill_tile;
 	@Getter
 	private JButton b_start_game;
@@ -33,11 +38,24 @@ public class ToolBar extends JMenuBar {
 	public ToolBar(Window win) {
 		this.win = win;
 		setLayout(new FlowLayout(FlowLayout.LEFT));
+		add(b_undo = button("undo", false, "Undo's latest change on Map", e -> {
+			MemoryStacks.loadUndoStack();
+			win.menu.checkUndoRedo();
+			win.repaint();
+		}));
+		b_undo.setEnabled(false);
+		add(b_redo = button("redo", false, "Redo's latest change on Map", e -> {
+			MemoryStacks.loadRedoStack();
+			win.menu.checkUndoRedo();
+			win.repaint();
+		}));
+		b_redo.setEnabled(false);
+		add(space(10, 0));
 		add(b_draw = button("draw", "Draw Mode", a -> win.setMode(Mode.DRAW_TILES)));
 		b_draw.setSelected(true);
 		add(b_blocking = button("blocking", "Blocking Mode", a -> win.setMode(Mode.SET_BLOCKING)));
 		add(b_entity = button("entity", "Entity Mode", a -> win.setMode(Mode.ENTITY)));
-		add(new JSeparator());
+		add(space(0, 0));
 		layerImg = new ImageIcon[3];
 		layerImg[0] = new ImageIcon(getClass().getResource(buttonPath + "layer1.png"));
 		layerImg[1] = new ImageIcon(getClass().getResource(buttonPath + "layer2.png"));
@@ -50,13 +68,13 @@ public class ToolBar extends JMenuBar {
 				layer++;
 			win.setLayer(layer);
 		}));
-		add(new JSeparator());
+		add(space(10, 0));
 		add(b_single_tile = button("single_tile", "Draw Single Tile", a -> win.setDrawShape(Shape.SINGLE)));
 		b_single_tile.setSelected(true);
 		add(b_rect_tile = button("rectangle_tile", "Draw in Rectangle Shape", a -> win.setDrawShape(Shape.RECT)));
 		add(b_circle_tile = button("circle_tile", "Draw in Circle Shape", a -> win.setDrawShape(Shape.CIRCLE)));
 		add(b_fill_tile = button("fill_tile", "Fill Tiles", a -> win.setDrawShape(Shape.FILL)));
-		add(new JSeparator());
+		add(space(10, 0));
 		add(b_start_game = button("start_game", "Start Game", e -> {
 			if (b_start_game.isSelected())
 				Main.stopGameProcess(win);

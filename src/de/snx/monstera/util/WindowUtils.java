@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 public class WindowUtils {
 
@@ -16,6 +17,13 @@ public class WindowUtils {
 		panel.add(label);
 		panel.add(component);
 		return panel;
+	}
+
+	public static JSeparator space(int width, int height) {
+		JSeparator separator = new JSeparator();
+		separator.setPreferredSize(
+				new Dimension(width <= 0 ? separator.getWidth() : width, height <= 0 ? separator.getHeight() : height));
+		return separator;
 	}
 
 }

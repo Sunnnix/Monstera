@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monsteracreator.Config;
 import de.snx.monsteracreator.Creator;
+import de.snx.monsteracreator.MemoryStacks;
 import de.snx.monsteracreator.window.MapViewPanel.Mode;
 import de.snx.monsteracreator.window.MapViewPanel.Shape;
 
@@ -74,7 +75,7 @@ public class Window extends JFrame {
 		});
 		setVisible(true);
 	}
-	
+
 	public void loadAll() {
 		tileset.loadTilesets();
 		map.loadMap(ProjectHandler.getMaps().getSelected());
@@ -95,6 +96,14 @@ public class Window extends JFrame {
 	public void setDrawShape(Shape shape) {
 		map.setShape(shape);
 		tools.setShape(shape);
+	}
+
+	/**
+	 * used to write memory stack TODO(and mark project as changed)
+	 */
+	public void onAction() {
+		MemoryStacks.addStack();
+		menu.checkUndoRedo();
 	}
 
 }

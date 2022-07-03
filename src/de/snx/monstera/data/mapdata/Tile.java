@@ -6,7 +6,7 @@ import de.snx.monstera.data.Project;
 import de.snx.monstera.data.ProjectHandler;
 import de.snx.monstera.data.Tilesets;
 
-public class Tile {
+public class Tile implements Cloneable {
 
 	public final int X, Y;
 	public int[] l1 = new int[] { -1, -1 }, l2 = new int[] { -1, -1 }, l3 = new int[] { -1, -1 };
@@ -32,6 +32,16 @@ public class Tile {
 		int ts = (int) (project.getTilesize() * project.getScale());
 		g.drawImage(ProjectHandler.getTilesets().get(l3, ProjectHandler.getMaps().getAnimTImer()), (int) (x - offsetX),
 				(int) (y - offsetY), ts, ts, null);
+	}
+
+	@Override
+	public Tile clone() {
+		Tile t = new Tile(X, Y);
+		t.l1 = l1.clone();
+		t.l2 = l2.clone();
+		t.l3 = l3.clone();
+		t.isBlocking = isBlocking;
+		return t;
 	}
 
 }

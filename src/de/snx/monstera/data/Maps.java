@@ -18,6 +18,7 @@ import de.snx.monstera.data.mapdata.Map;
 import de.snx.monstera.state.GameStateManager;
 import de.snx.monstera.state.WorldState;
 import de.snx.monstera.util.WindowUtils;
+import de.snx.monsteracreator.MemoryStacks;
 import de.snx.monsteracreator.window.Window;
 import de.snx.psf.PSFFileIO;
 import lombok.Getter;
@@ -67,8 +68,10 @@ public class Maps extends IDSorted<Map> {
 				e.printStackTrace();
 			}
 		}
-		if (values.size() > 0)
+		if (values.size() > 0) {
 			selected = (Map) values.values().toArray()[0];
+			MemoryStacks.addStack();
+		}
 	}
 
 	public void newMapDialog(Window window) {
@@ -84,7 +87,10 @@ public class Maps extends IDSorted<Map> {
 				null, values.values().toArray(), selected);
 		if (map == null)
 			return;
+		boolean wasNull = selected == null;
 		selected = map;
+		if (wasNull)
+			MemoryStacks.addStack();
 		window.map.loadMap(selected);
 	}
 
